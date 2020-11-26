@@ -1,0 +1,18 @@
+{
+	"contentManagement": [
+		{
+			"title": "节目播放申请",
+			"icon": "&#xe61c;",
+			"href": "import/list?page=1&limit=10&type=1",
+			"spread": false
+		},
+		{
+			"title": "广告播放申请",
+			"icon": "&#xe609;",
+			"href": "import/list?page=1&limit=10&type=2",
+			"spread": false
+		}
+	]
+}
+
+

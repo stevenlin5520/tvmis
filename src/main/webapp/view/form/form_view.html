@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <base href="<%=basePath%>">
+
+    <title>My JSP 'view_list.jsp' starting page</title>
+
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="This is my page">
+
+    <link href="http://cdn.bootcss.com/video.js/7.0.0-alpha.1/alt/video-js-cdn.css" rel="stylesheet">
+    <script src="http://cdn.bootcss.com/video.js/7.0.0-alpha.1/video.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery2.1.4.js"></script>
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="../../layui/layui.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+<div style="display: flex;flex-direction: row">
+    <div style="width: auto;height: 100%;">
+        <table class="table table-condensed" style="margin-top:8px;overflow-y: auto" id="table">
+            <thead>
+                <td align="center">序号</td>
+                <td align="center">节目名称</td>
+                <td align="center">开始时间</td>
+                <td align="center">结束时间</td>
+                <td align="center">播放时长</td>
+                <td align="center">查看</td>
+            </thead>
+            <!--<c:forEach var="item" items="${plays}" varStatus="status">
+                <tr>
+                    <td align="center">${status.index+1}</td>
+                    <td align="center">${item.playTvName}</td>
+                    <td align="center"><fmt:formatDate value="${item.playStart}" type="date"></fmt:formatDate> </td>
+                    <td align="center"><fmt:formatDate value="${item.playEnd}" type="date"></fmt:formatDate> </td>
+                    <td align="center">${item.playLength}</td>
+                    <td align="center">
+                        <div class="layui-btn-group">
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" onclick="viewFile('${item.playScreen}')">
+                                <i class="layui-icon">&#xe64a;</i>
+                            </button>
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-warm" onclick="viewFile('${item.playVideo}')" >
+                                <i class="layui-icon">&#xe6ed;</i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </c:forEach>-->
+        </table>
+    </div>
+    <!--<div style="width: 900px;height: 670px;background-color: grey;">
+        <video id="playVideo" width="1000" height="600" poster="http://127.0.0.1/84F4A34D15F141C78460E2D081E5B0DA.jpg" controls
+               class="video-js vjs-big-play-centered vjs-default-skin" preload="auto" webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow">
+            <source id="videoSrc" src="http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4" type="video/mp4"></source>
+        </video>
+    </div>-->
+</div>
+
+
+<script>
+    let filePath
+    /*var myvideo=videojs("playVideo");
+    myvideo.on("ended",function(){
+        console.log("视频播放结束");
+
+        myvideo.pause()
+        $("#videosrc").attr('src', 'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4')
+        myvideo.load();
+    })*/
+    /*function viewFile(file){
+        // myvideo.pause()
+        // $("#videoSrc").attr('src', filePath+'/'+file)
+        // myvideo.load();
+        // myvideo.play();
+
+        myvideo.src([
+            {type: 'application/x-mpegURL', src: 'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4'}
+            ])
+        myvideo.load()
+
+
+    }*/
+
+    window.onload=function(){
+        loadData();
+
+    }
+
+    /**
+     * 获取数据
+     */
+    function loadData(){
+        let id = location.search.substring(4,location.search.length)
+        $.get('../../form/viewForm?id='+id,{},function(res){
+            console.log("获取频道Tab数据",res)
+            if(res.state){
+                filePath = res.result.filePath
+                let list = res.result.list
+                let html = "";
+                for(let index in list){
+                    html += "<tr>\n" +
+                        "                    <td align=\"center\">"+(index+1)+"</td>\n" +
+                        "                    <td align=\"center\">"+list[index].playTvName+"</td>\n" +
+                        "                    <td align=\"center\">"+list[index].playStart+"</td>\n" +
+                        "                    <td align=\"center\">"+list[index].playEnd+"</td>\n" +
+                        "                    <td align=\"center\">"+list[index].playLength+"</td>\n" +
+                        "                    <td align=\"center\">\n" +
+                        "                        <div class=\"layui-btn-group\">\n" +
+                        "                            <button type=\"button\" class=\"layui-btn layui-btn-sm layui-btn-normal\" onclick=\"viewFile('"+list[index].playVideo+"')\">\n" +
+                        "                                <i class=\"layui-icon\">&#xe6ed;</i>\n" +
+                        "                            </button>\n" +
+                        "                        </div>\n" +
+                        "                    </td>\n" +
+                        "                </tr>"
+                    /*myvideo.pause()
+                    $("#videoSrc").attr('src', filePath+'/'+list[index].playVideo)
+                    myvideo.load();*/
+                }
+                $("#table").append(html)
+            }else{
+                console.log(res.msg)
+            }
+        })
+    }
+
+    layui.use(['laypage', 'layer']);
+    function viewFile(file){
+        top.layer.open({
+            type: 2,
+            title:'查看文件',
+            closeBtn: 1, //显示关闭按钮
+            shade: [0.5],
+            area: ['900px;', '600px'],
+            offset: 'c', //居中弹出
+            time: 0, //0秒后自动关闭
+            anim: 2,
+            content: [filePath+'/'+file, 'no'], //iframe的url，no代表不显示滚动条
+            yes: function(index, layero){
+                layer.close(index); //如果设定了yes回调，需进行手工关闭
+            }
+        });
+    }
+</script>
+</body>
+</html>

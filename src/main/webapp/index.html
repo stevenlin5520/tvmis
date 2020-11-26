@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>黑龙江电视台节目管理系统</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="icon" href="favicon.ico">
+	<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/index.css" media="all" />
+
+</head>
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/cache.js"></script>
+<body class="main_body">
+	<div class="layui-layout layui-layout-admin">
+
+
+		<!-- 顶部 -->
+		<div class="layui-header header">
+			<div class="layui-main mag0">
+				<a href="#" class="logo" ><span id="sysLogo">LayuiIMS 1.0</span></a>
+				<!-- 显示/隐藏菜单 -->
+				<a href="javascript:;" class="seraph hideMenu icon-caidan"></a>
+
+			    <!-- 顶部右侧菜单 -->
+			    <ul class="layui-nav top_menu">
+					<li class="layui-nav-item" pc>
+						<a href="javascript:;" class="clearCache"><i class="layui-icon" data-icon="&#xe640;">&#xe640;</i><cite>清除缓存</cite><span class="layui-badge-dot"></span></a>
+					</li>
+					<li class="layui-nav-item" id="userInfo">
+						<a href="javascript:;"><img src="images/face.jpg" class="layui-nav-img userAvatar" width="35" height="35"><cite class="adminName"></cite></a>
+						<dl class="layui-nav-child">
+							<dd><a href="javascript:;" data-url="user/toEditInfo"><i class="seraph icon-ziliao" data-icon="icon-ziliao"></i><cite>个人资料</cite></a></dd>
+							<dd><a href="javascript:;" data-url="view/user/user_password.html"><i class="seraph icon-xiugai" data-icon="icon-xiugai"></i><cite>修改密码</cite></a></dd>
+							<dd pc><a href="javascript:;" class="changeSkin"><i class="layui-icon">&#xe61b;</i><cite>更换皮肤</cite></a></dd>
+							<dd><a href="javascript:void(0);" class="signOut" onclick="loginOut()"><i class="seraph icon-tuichu"></i><cite>退出</cite></a></dd>
+						</dl>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+
+		<!-- 左侧导航 -->
+		<div class="layui-side layui-bg-black">
+			<div class="user-photo">
+				<a class="img" title="我的头像" ><img src="images/face.jpg" class="userAvatar"></a>
+				<p id="welcomeInfo" style="display: none">你好！<span class="userName"></span>, 欢迎登录</p>
+			</div>
+			<div class="navBar layui-side-scroll" id="navBar">
+				<ul class="layui-nav layui-nav-tree">
+				</ul>
+			</div>
+		</div>
+
+
+		<!-- 右侧内容 -->
+		<div class="layui-body layui-form">
+			<div class="layui-tab mag0" lay-filter="bodyTab" id="top_tabs_box">
+				<ul class="layui-tab-title top_tab" id="top_tabs">
+					<!-头部显示的后台首页功能-->
+					<li class="layui-this" lay-id=""><i class="layui-icon">&#xe68e;</i> <cite>后台首页</cite></li>
+				</ul>
+				<ul class="layui-nav closeBox">
+				  <li class="layui-nav-item">
+				    <a href="javascript:;"><i class="layui-icon caozuo">&#xe643;</i> 页面操作</a>
+				    <dl class="layui-nav-child">
+					  <dd><a href="javascript:;" class="refresh refreshThis"><i class="layui-icon">&#x1002;</i> 刷新当前</a></dd>
+				      <dd><a href="javascript:;" class="closePageOther"><i class="seraph icon-prohibit"></i> 关闭其他</a></dd>
+				      <dd><a href="javascript:;" class="closePageAll"><i class="seraph icon-guanbi"></i> 关闭全部</a></dd>
+				    </dl>
+				  </li>
+				</ul>
+				<div class="layui-tab-content clildFrame">
+					<div class="layui-tab-item layui-show">
+<!--						<iframe src="video.html"></iframe>-->
+						<iframe src="television/list?page=1&limit=10"></iframe>
+<!--						<iframe src="page/main.html"></iframe>-->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 底部 -->
+		<div class="layui-footer footer">
+			<p><span id="copyright">copyright @2020 steven</span></p>
+		</div>
+	</div>
+
+	<!-- 移动导航 -->
+	<div class="site-tree-mobile"><i class="layui-icon">&#xe602;</i></div>
+	<div class="site-mobile-shade"></div>
+<script>
+	window.onload=function(){
+		//加载系统信息
+		loadSysInfo()
+
+		//设置用户信息
+		let cookieList = document.cookie.split("; ");
+		console.log(cookieList)
+		let userId
+		let userName
+		let userPhoto
+		for(let i in cookieList){
+			let item = cookieList[i]
+			if(cookieList[i].startsWith("userId=")){
+				userId = item.substring(7,item.length)
+			}else if(cookieList[i].startsWith("userName=")){
+				//设置用户名
+				userName = item.substring(9,item.length)
+				document.getElementsByClassName("userName")[0].innerHTML=userName
+				document.getElementsByClassName("adminName")[0].innerHTML=userName
+				$("#welcomeInfo").removeAttr("style")
+			}else if(cookieList[i].startsWith("userPhoto=")){
+				//设置头像
+				userPhoto = item.substring(10,item.length)
+				let userAvatars = document.getElementsByClassName("userAvatar")
+				for(let j in userAvatars){
+					userAvatars[j].src=userPhoto
+				}
+			}else if(cookieList[i].startsWith("userType=")){
+				userType = item.substring(9,item.length)
+			}
+		}
+	}
+
+
+	function loadSysInfo(){
+		$.get('system/getSysInfo',{},function(res){
+			console.log("获取频道Tab数据",res)
+			if(res.state){
+				document.getElementById("sysLogo").innerText=res.result.sysLogo
+				document.getElementById("copyright").innerText=res.result.copyright
+			}else{
+				console.log(res.msg)
+			}
+		})
+	}
+
+	/**
+	 * 退出登录清空cookie
+	 */
+	function loginOut(){
+		let exp =  new Date()
+		exp.setTime(exp.getTime()-1);
+		let keys=document.cookie.match(/[^=;]+(?=\=)/g)
+		if(keys){
+			for(let i in keys){
+				document.cookie=keys[i]+"=0;expire="+exp.toGMTString()+";path=/tvmis"
+			}
+		}
+
+		sessionStorage.clear()
+		$.get('loginOut',{},function(){
+			location.href="login.html"
+		})
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   <title>黑龙江电视台</title>
+	<link href="http://cdn.bootcss.com/video.js/7.0.0-alpha.1/alt/video-js-cdn.css" rel="stylesheet">
+	<script src="http://cdn.bootcss.com/video.js/7.0.0-alpha.1/video.min.js"></script>
+    <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="layui/layui.js"></script>
+	<script src="js/DateUtil.js"></script>
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"-->
+<!--          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"-->
+<!--            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>-->
+</head>
+<style>
+    .tab {
+        width: 150px;
+        background-color: #36393F;
+    }
+    .tab_selected {
+        width: 150px;
+        background-color: #5FB878;
+    }
+    .tv {
+        background-color: #222328;
+        color: white;
+    }
+    .tv_selected {
+        background-color: #D3D4D3;
+        color: #222328;
+    }
+</style>
+
+
+<body style="width: 100%;height: 300px;background-color: #191A20;display: flex;flex-direction: column;align-items: center">
+    <div style="width: 95%;height: 60px;background-color: #36393F; line-height: 60px;text-align: center;font-size: 20px;" >
+        <div id="functions" style="display: flex;flex-direction: row;justify-content: space-around;align-items: flex-start;width: 100%;height: 60px;">
+             <!--<div style='width: 150px;background-color: #5FB878' onclick='selectChannel()' class="channel tab_selected">
+                <span style='color: white;'>电影频道</span>
+            </div>-->
+        </div>
+    </div>
+
+
+    <div style="height: 20px;width: 95%;background-color: white;"></div>
+
+    <div style="margin-top:20px;width: 95%;height: 800px;display: flex;flex-direction: row">
+        <div style="width: 80%;height: 800px;">
+			<!-- 
+			vjs-big-play-centered  按钮居中显示
+			preload="auto"	预加载
+			poster="data/poster.jpg"	封面图片
+			vjs-default-skin 为 HMTL 控制条应用默认的皮肤，可以被移除或重写，以创建你自己的控制条样式
+			loop="loop"				循环播放
+			autoplay="autoplay" 		自动播放
+			controls              	自动逸进度条不能填写此属性
+			webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow"      ios中h5播放器自动全屏
+			 -->
+			<!--<video id="myvideo" class="video-js vjs-big-play-centered " width="1400" height="800"
+			preload="auto" poster="http://127.0.0.1/66d4a6eb67364587a473053a0617a612.jpg" webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow">
+				<source id="videosrc" src="http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4"></source>
+			</video>-->
+            <iframe src="video_content.html" width="1400" height="800" scrolling="no" frameborder="0"></iframe>
+        </div>
+
+
+        <div id="television" style="width: 20%;height: 800px;display: flex;flex-direction: column;justify-content: flex-start;align-items: flex-start;overflow-y: scroll">
+            <!--<div style="width: 100%;height: 180px;display: flex;flex-direction: column;border-radius: 15px;" class="television tv_selected">
+                <div style="width: 100%;height: 180px;display:flex;flex-direction: row;">
+                    <div style="width: 40%;height: 150px;">
+                        <div style="height: 80px;line-height: 80px;font-size: 22px;text-align: center;color: #00d20d">18:56:17</div>
+                        <div style="height: 70px;font-size: 18px;text-align: center;">
+                            <span>
+                                我的美好女孩<br>(第一集)
+                            </span>
+                        </div>
+                    </div>
+                    <div style="width: 56%;height: 150px;" >
+                        <img src="http://127.0.0.1/66d4a6eb67364587a473053a0617a612.jpg" width="100%" height="140" style="margin-top: 10px;">
+                    </div>
+                </div>
+                <div style="width: 100%;height: 30px;border-bottom-left-radius: 15px;" >
+                    <span style="border-bottom-left-radius: 15px;padding-left: 15px;">讲述美好女孩的爱情故事...</span>
+                </div>
+            </div>
+            <div style="width: 100%;height: 10px;"><span></span></div>-->
+        </div>
+    </div>
+</body>
+<script>
+    let channelList;
+    let televisionList;
+    let filePath
+    localStorage.removeItem("isClickTab")
+    localStorage.removeItem("receiveTvState")
+    localStorage.removeItem("receivePlaySrc")
+
+	/*var videoList = ['http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4',
+		'http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4', 
+	'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4', 
+	'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4']; // 初始化播放列表
+	var videoCount = videoList.length; // 播放列表的长度
+	var current = 0; // 当前播放的视频
+	
+	var myvideo=videojs("myvideo");
+	$("#videosrc").attr('src', videoList[current++])
+	
+	//设置当前播放时间
+	myvideo.currentTime(10)
+	
+	//就绪方法
+	myvideo.ready(function(){
+		console.log("已就绪,"+	myvideo.duration());
+		//加载完成自动播放
+		$("#videosrc").attr('src', videoList[current++])
+		myvideo.load();
+		// myvideo.play();
+		
+		//设置声音大小
+		myvideo.volume(1)
+		
+		console.log("视频进度",   this.buffered())
+		console.log("查看更多",		myvideo)
+	});
+
+	//绑定在window上，点击可获取当前播放时间进度
+	// console.log(myvideo.currentTime());
+	// myvideo.duration()		获取总时长，在ready中不能显示
+	
+	//视频监听函数
+	myvideo.on("ended",function(){
+		console.log("视频播放结束",new Date().Format("yyyy-MM-dd hh:mm:ss"));
+		
+		myvideo.pause()
+		$("#videosrc").attr('src', videoList[current++])
+		myvideo.load();
+		myvideo.play();
+	})
+	
+	myvideo.on("pause",function(){
+		console.log("点击暂停");
+	})
+	
+	myvideo.on("play",function(){
+		console.log("点击播放");
+	})
+	
+	myvideo.on("volumechange",function(){
+		console.log("声音改变");
+	})
+	
+	myvideo.on("timeupdate",function(){
+		console.log("视频播放中");
+	})
+	
+	myvideo.on("seeked",function(){
+		console.log("视频跳转结束");
+	})
+	
+	myvideo.on("seeking",function(){
+		console.log("视频跳转中");
+	})*/
+</script>
+<script>
+	
+	/**
+	 * 页面初始加载数据
+	 */
+    window.onload = function(){
+		//初始化频道
+        initChannel();
+    }
+
+	/**
+	 * 获取频道Tab
+	 */
+	function initChannel(){
+		$.get('channel/listTabs',{},function(res){
+		    console.log("获取频道Tab数据",res)
+		    if(res.state){
+		        let list = res.result;
+                channelList = res.result;
+		        let html = "";
+		        // $("#functions div").remove()
+		        for(let index in list){
+		            html += "<div onclick=\"selectChannel('"+list[index].channelId+"',this)\" class=\"channel "+(index == 0 ? 'tab_selected' : 'tab')+"\">\n" +
+		                "                <span style='color: white'>"+list[index].channelName+"</span>\n" +
+		                "            </div>"
+		        }
+		        if(list.length>15){
+		            $("#functions").attr("style", $("#functions").attr("style")+"overflow-x: auto");
+		        }
+		        $("#functions").append(html)
+		    }else{
+		        console.log(res.msg)
+		    }
+
+            localStorage.setItem("isClickTab","200")
+            //初始化节目
+            initTelevision(channelList[0].channelId);
+		}) 
+	}
+
+
+	/**
+     * 获取节目列表
+     **/
+	function initTelevision(channelId){
+        $.get('television/televisionList',{channelId:channelId},function(res){
+            console.log("获取节目列表数据",res)
+            if(res.state){
+                let list = res.result.list
+                televisionList = res.result.list
+                filePath = res.result.filePath
+                let html = "";
+                $("#television div").remove()
+                for(let index in list){
+                    html += "<div style=\"width: 100%;height: 180px;display: flex;flex-direction: column;border-radius: 15px;\" class=\"television "+(index==0?'tv_selected':'tv')+"\"  onclick=\"changeTv('"+list[index].tvVideo+"',this)\">\n" +
+                        "                <div style=\"width: 100%;height: 180px;display:flex;flex-direction: row;\" >\n" +
+                        "                    <div style=\"width: 40%;height: 150px;\">\n" +
+                        "                        <div style=\"height: 80px;line-height: 80px;font-size: 22px;text-align: center;color: #00d20d\">"+list[index].playStart+"</div>\n" +
+                        "                        <div style=\"height: 70px;font-size: 18px;text-align: center;\">\n" +
+                        "                            <span>\n" +
+                        "                                "+list[index].tvName+"\n" +
+                        "                            </span>\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                    <div style=\"width: 56%;height: 150px;\" >\n" +
+                        "                        <img src=\""+filePath+"\\"+list[index].tvImage+"\" width=\"100%\" height=\"140\" style=\"margin-top: 10px;\">\n" +
+                        "                    </div>\n" +
+                        "                </div>\n" +
+                        "                <div style=\"width: 100%;height: 30px;border-bottom-left-radius: 15px;\" >\n" +
+                        "                    <span style=\"border-bottom-left-radius: 15px;padding-left: 15px;\">"+list[index].tvDesc+"</span>\n" +
+                        "                </div>\n" +
+                        "            </div>\n" +
+                        "            <div style=\"width: 100%;height: 10px;\"></div>"
+
+
+                    // localStorage.setItem("receiveTvList","200")
+                }
+                $("#television").append(html)
+
+                let isClickTab = localStorage.getItem("isClickTab");
+                if(isClickTab == 200){
+                    localStorage.setItem("receiveTvState","200")
+                    localStorage.setItem("receivePlaySrc",filePath+"/"+list[0].tvVideo)
+                }
+            }else{
+                console.log(res.msg)
+            }
+        })
+    }
+
+
+    /**
+	 * 选中频道点击事件
+	 * @param {Object} id
+	 */
+    function selectChannel(id,_this){
+        //样式修改
+        $(".channel").each(function (index,obj){
+            $(obj).attr("class","channel tab")
+            if(_this==obj){
+                $(obj).attr("class","channel tab_selected")
+            }
+        })
+
+        console.log("选择频道",id)
+        initTelevision(id);
+        //此标志用于控制页面点击了频道Tab选项后的播放情况。当选择了节目后进行视频暂停
+        localStorage.setItem("isClickTab","200")
+        localStorage.removeItem("receiveTvState")
+        localStorage.removeItem("receivePlaySrc")
+    }
+
+    /**
+     * 选择节目点击事件
+     */
+    function changeTv(file,_this){
+        //样式修改
+        $(".television").each(function(index,obj){
+            console.log(obj)
+            $(obj).attr("class","television tv")
+            if(obj == _this){
+                $(obj).attr("class","television tv_selected")
+            }
+        })
+
+        localStorage.setItem("isClickTab","200")
+        localStorage.setItem("receiveTvState","200")
+        localStorage.setItem("receivePlaySrc", filePath+"/"+file)
+    }
+</script>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html class="loginHtml">
+<head>
+	<meta charset="utf-8">
+	<title>登录--layui后台管理模板 2.0</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/public.css" media="all" />
+	<script type="text/javascript" src="js/jquery2.1.4.js"></script>
+	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+	<script type="text/javascript" src="layui/layui.js"></script>
+	<script type="text/javascript" src="js/cache.js"></script>
+</head>
+<body class="loginBody" style="background:url('images/cctv2.jpg') no-repeat center center">
+
+	<div style="width: 950px;height: 120px;color: white;font-size: 70px;margin-left: auto;margin-right: auto;margin-top: 50px;">
+		<span style="line-height: 120px;padding-left: 70px;">黑龙江电视台节目播放系统</span>
+	</div>
+
+	<form class="layui-form" style="height: 280px;width: 350px;" action="loginIn" method="post" >
+		<div class="login_face"><img src="images/face.jpg" class="userAvatar"></div>
+		<div class="layui-form-item input-item">
+			<label for="userName">用户名</label>
+			<input type="text" placeholder="请输入用户名" name="user" autocomplete="off" id="userName" class="layui-input" lay-verify="required">
+		</div>
+		<div class="layui-form-item input-item">
+			<label for="password">密码</label>
+			<input type="password" placeholder="请输入密码" name="password" autocomplete="off" id="password" class="layui-input" lay-verify="required">
+		</div>
+		<div class="layui-form-item" style="margin-top: 30px;">
+			<button class="layui-btn layui-block" lay-filter="login" lay-submit>登录</button>
+		</div>
+	</form>
+</body>
+<script>
+	window.onload=function(){
+		let state = '${state}';
+
+	}
+	layui.use(['form','layer','jquery'],function(){
+		var form = layui.form,
+				layer = parent.layer === undefined ? layui.layer : top.layer
+		$ = layui.jquery;
+
+		$(".loginBody .seraph").click(function(){
+			layer.msg("这只是做个样式，至于功能，你见过哪个后台能这样登录的？还是老老实实的找管理员去注册吧",{
+				time:5000
+			});
+		})
+
+		//登录按钮
+		form.on("submit(login)",function(data){
+			let _this = this
+			$(this).text("登录中...").attr("disabled","disabled").addClass("layui-disabled");
+			$.ajax({
+				url: data.form.action,
+				data: data.field,
+				dataType: 'json',
+				contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+				type: 'post',
+				success: function(res){
+					console.log(res)
+					if(!res.state){
+						layer.open({
+							type: 0,
+							title: '提示',
+							content: res.result,
+							icon: -1,
+							time: 2000
+						})
+					}else{
+						setTimeout(function(){
+							location.href=res.result
+						},1500)
+						layer.msg("登陆成功", {time: 1500, anim: 6})
+
+
+					}
+				},
+				complete: function(res){
+					$(_this).text("登录").removeClass('layui-disabled').removeAttr("disabled")
+				}
+			})
+			return false;
+		})
+
+		//表单输入效果
+		$(".loginBody .input-item").click(function(e){
+			e.stopPropagation();
+			$(this).addClass("layui-input-focus").find(".layui-input").focus();
+		})
+		$(".loginBody .layui-form-item .layui-input").focus(function(){
+			$(this).parent().addClass("layui-input-focus");
+		})
+		$(".loginBody .layui-form-item .layui-input").blur(function(){
+			$(this).parent().removeClass("layui-input-focus");
+			if($(this).val() != ''){
+				$(this).parent().addClass("layui-input-active");
+			}else{
+				$(this).parent().removeClass("layui-input-active");
+			}
+		})
+	})
+
+</script>
+</html>

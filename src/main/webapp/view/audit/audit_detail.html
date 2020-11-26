@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../../js/jquery2.1.4.js"></script>
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="../../layui/layui.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</head>
+<body>
+<form class="layui-form" action="../../audit/saveAuditInfo" style="margin-top:10px;" method="post">
+    <div style="width: 300px;height: 100px;font-size: large;color: #d84f4b;margin-left: 80px;margin-top: 20px;">
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;请谨慎操作!如果审核通过，则将该节目放入到节目单中；如果拒绝审核，请填写拒绝原因</span>
+    </div>
+    <div style="width: 300px;height: 60px;margin-left: 80px;">
+        <input type="text" name="content" value="" lay-verify="required" autocomplete="off" placeholder="请输入拒绝原因" class="layui-input">
+    </div>
+    <div style="margin-top: 5px;margin-left: 80px;width: 300px;height: 60px;display: flex;flex-direction: row;justify-content: space-around">
+        <div >
+            <button type="button" class="layui-btn"  onclick="auditForm(2)" lay-submit="" lay-filter="save">审核通过</button>
+        </div>
+        <div >
+            <button type="button" class="layui-btn layui-btn-danger" onclick="auditForm(3)" lay-submit=""  lay-filter="save">审核拒绝</button>
+        </div>
+    </div>
+</form>
+</body>
+<script>
+    var layer
+    layui.use('layer', function(){
+        layer = layui.layer;
+    });
+    function auditForm(type){
+        console.log(location.search)
+        let urls = location.search.substring(1,location.search.length).split('&');
+        console.log(urls)
+        let id = urls[0]
+        id = id.substring(3,id.length)
+        let path = urls[1]
+        path = path.substring(5,path.length)
+        console.log(id,path)
+        let content = $("input[name=content]").val()
+        if(type == 3 && (content == null || content == '')){
+            layer.msg("请输入拒绝原因", {time: 1500, anim: 6});
+            return;
+        }
+        let loading = layer.msg('保存中', {
+            icon: 16
+            ,anim: -1
+            ,shade: 0.5    //遮罩
+            ,fixed: true
+            ,time: false    //手动关闭
+        });
+        $.ajax({
+            url: path+'/audit/saveAuditInfo',
+            data: {id:id,auditStatus:type,content:content},
+            dataType: 'json',
+            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+            type: 'post',
+            success: function(res){
+                console.log(res)
+                if(!res.state){
+                    layer.open({
+                        type: 0,
+                        title: '提示',
+                        content: res.msg,
+                        icon: -1,
+                        time: 2000
+                    })
+                }else{
+                    let index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);//关闭当前页
+                    window.parent.location.reload();
+                }
+            },
+            complete: function(){
+                layer.close(loading)
+            }
+        })
+    }
+</script>
+</html>

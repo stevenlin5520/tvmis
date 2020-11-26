@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="http://cdn.bootcss.com/video.js/7.0.0-alpha.1/alt/video-js-cdn.css" rel="stylesheet">
+    <script src="http://cdn.bootcss.com/video.js/7.0.0-alpha.1/video.min.js"></script>
+    <script type="text/javascript" src="js/jquery2.1.4.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="layui/layui.js"></script>
+    <script src="js/DateUtil.js"></script>
+</head>
+<body style="width: 1400px;height: 800px;">
+    <video id="myvideo" class="video-js vjs-big-play-centered " width="1400" height="800" controls
+           preload="auto" poster="http://127.0.0.1/66d4a6eb67364587a473053a0617a612.jpg" webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow">
+        <source id="videosrc" src="http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4"></source>
+    </video>
+</body>
+<script>
+    // 初始化播放列表
+    var videoList = ['http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4',
+        'http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4',
+        'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4',
+        'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4'];
+    // 播放列表的长度
+    var videoCount = videoList.length;
+    // 当前播放的视频
+    var current = 0;
+
+    /**
+     * 播放器设置
+     */
+    var myvideo=videojs("myvideo");
+    $("#videosrc").attr('src', videoList[current++])
+
+    //设置当前播放时间
+    myvideo.currentTime(10)
+
+    //就绪方法
+    myvideo.ready(function(){
+        console.log("已就绪,"+	myvideo.duration());
+        //加载完成自动播放
+        $("#videosrc").attr('src', videoList[current++])
+        myvideo.load();
+        // myvideo.play();
+
+        //设置声音大小
+        myvideo.volume(1)
+
+        console.log("视频进度",   this.buffered())
+        console.log("查看更多",		myvideo)
+    });
+
+    //绑定在window上，点击可获取当前播放时间进度
+    // console.log(myvideo.currentTime());
+    // myvideo.duration()		获取总时长，在ready中不能显示
+
+    /**
+     * 视频监听函数
+     */
+    /*myvideo.on("ended",function(){
+        console.log("视频播放结束",new Date().Format("yyyy-MM-dd hh:mm:ss"));
+
+        myvideo.pause()
+        $("#videosrc").attr('src', videoList[current++])
+        // myvideo.load();
+        myvideo.play();
+    })*/
+
+    /*myvideo.on("pause",function(){
+        console.log("点击暂停");
+    })
+
+    myvideo.on("play",function(){
+        console.log("点击播放");
+    })
+
+    myvideo.on("volumechange",function(){
+        console.log("声音改变");
+    })
+
+    myvideo.on("timeupdate",function(){
+        console.log("视频播放中");
+    })
+
+    myvideo.on("seeked",function(){
+        console.log("视频跳转结束");
+    })
+
+    myvideo.on("seeking",function(){
+        console.log("视频跳转中");
+    })*/
+</script>
+<script>
+    setInterval(function(){
+        let checkTab = localStorage.getItem("isClickTab");
+        if(checkTab == 200){
+            myvideo.pause()
+            let receiveTvState = localStorage.getItem("receiveTvState")
+
+            if(receiveTvState == 200){
+                localStorage.removeItem("isClickTab")
+                localStorage.removeItem("receiveTvState")
+                let receivePlaySrc = localStorage.getItem("receivePlaySrc")
+                console.log("播放视频："+receivePlaySrc)
+                $("#videosrc").attr('src', receivePlaySrc)
+                myvideo.load();
+                // myvideo.play();
+            }
+        }
+
+    },100)
+</script>
+</html>

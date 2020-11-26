@@ -1,0 +1,24 @@
+{
+	"contentManagement": [
+		{
+			"title": "节目审核",
+			"icon": "&#xe61c;",
+			"href": "audit/list?page=1&limit=10&type=1",
+			"spread": false
+		},
+		{
+			"title": "广告审核",
+			"icon": "&#xe609;",
+			"href": "audit/list?page=1&limit=10&type=2",
+			"spread": false
+		},
+		{
+			"title": "供应商节目审核",
+			"icon": "&#xe609;",
+			"href": "audit/televisionList?page=1&limit=10",
+			"spread": false
+		}
+	]
+}
+
+
