@@ -11,27 +11,17 @@
     <script src="js/DateUtil.js"></script>
 </head>
 <body style="width: 1400px;height: 800px;">
-    <video id="myvideo" class="video-js vjs-big-play-centered " width="1400" height="800" controls
-           preload="auto" poster="http://127.0.0.1/66d4a6eb67364587a473053a0617a612.jpg" webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow">
-        <source id="videosrc" src="http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4"></source>
+    <video id="myvideo" class="video-js vjs-big-play-centered " width="1400" height="800" controls data-step=""
+           preload="auto" poster="images/black.jpg" webkit-playsinline playsinline x5-playsinline x-webkit-airplay="allow">
+        <source id="videosrc" src=""></source>
     </video>
 </body>
 <script>
-    // 初始化播放列表
-    var videoList = ['http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4',
-        'http://127.0.0.1/025770780FD64D05ABB4CB3D95EBCEA9.mp4',
-        'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4',
-        'http://127.0.0.1/973f052385dc6662de28af4345ee7f80.mp4'];
-    // 播放列表的长度
-    var videoCount = videoList.length;
-    // 当前播放的视频
-    var current = 0;
 
     /**
      * 播放器设置
      */
     var myvideo=videojs("myvideo");
-    $("#videosrc").attr('src', videoList[current++])
 
     //设置当前播放时间
     myvideo.currentTime(10)
@@ -40,7 +30,6 @@
     myvideo.ready(function(){
         console.log("已就绪,"+	myvideo.duration());
         //加载完成自动播放
-        $("#videosrc").attr('src', videoList[current++])
         myvideo.load();
         // myvideo.play();
 
@@ -103,7 +92,9 @@
                 localStorage.removeItem("receiveTvState")
                 let receivePlaySrc = localStorage.getItem("receivePlaySrc")
                 console.log("播放视频："+receivePlaySrc)
-                $("#videosrc").attr('src', receivePlaySrc)
+
+                $("#videosrc").attr('myvideo', receivePlaySrc)
+                myvideo.src(receivePlaySrc)
                 myvideo.load();
                 // myvideo.play();
             }

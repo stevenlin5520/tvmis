@@ -473,8 +473,8 @@
   order by play_start-->
   <select id="televisionList" resultType="list" resultMap="TelevisionVoMap" parameterType="string">
     select tp.play_date playDate, tp.play_start playStart, tp.play_end playEnd, tt.tv_name tvName, tt.tv_desc tvDesc, tt.tv_screen tvImage, tt.tv_location tvVideo
-  from t_play tp left join t_form tf on tp.play_form=tf.form_id left join t_television tt on tp.play_tv_id=tt.tv_id
-  where tp.play_date='2020-11-15' and form_content='3fb6ff88baf748ac90e2d08ea142cc6a'
-  order by play_start
+    from t_play tp left join t_form tf on tp.play_form=tf.form_id left join t_television tt on tp.play_tv_id=tt.tv_id
+    where tp.play_date=DATE_FORMAT(now(),'%Y-%m-%d') and form_content=#{channelId}
+    order by play_start
   </select>
 </mapper>
