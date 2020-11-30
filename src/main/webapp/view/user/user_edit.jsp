@@ -84,10 +84,14 @@
                     <input type="radio" name="userSex" value="2" title="女" <c:if test="${bean.userSex==2}">checked</c:if> >
                 </td>
                 <td style="text-align: center">
-                    <label >用户地址：</label>
+                    <label >用户权限：</label>
                 </td>
                 <td >
-                    <input type="text" name="userAddress" value="${bean.userAddress}" autocomplete="off" placeholder="请输入用户地址" class="layui-input">
+                    <select name="userType" class="layui-select layui-input-inline">
+                        <option value="1" <c:if test="${bean.userType==1}">selected</c:if>>录入员</option>
+                        <option value="2" <c:if test="${bean.userType==2}">selected</c:if>>审核员</option>
+                        <option value="3" <c:if test="${bean.userType==3}">selected</c:if>>供应商</option>
+                    </select>
                 </td>
             </tr>
             <tr >
@@ -110,23 +114,30 @@
                     </select>
                 </td>
             </tr>
-            <tr>
+            <tr >
                 <td style="text-align: center">
-                    <label >用户权限：</label>
+                    <label >用户地址：</label>
                 </td>
-                <td >
-                    <select name="userType" class="layui-select layui-input-inline">
-                        <%--1录入员；2、审核员；3、供应商；9管理员--%>
-                        <option value="1" <c:if test="${bean.userType==1}">selected</c:if>>录入员</option>
-                        <option value="2" <c:if test="${bean.userType==2}">selected</c:if>>审核员</option>
-                        <option value="3" <c:if test="${bean.userType==3}">selected</c:if>>供应商</option>
-                    </select>
-                </td>
-                <td style="text-align: center">
-
-                </td>
-                <td >
-
+                <td colspan="3">
+<%--                    <input type="text" name="userAddress" value="${bean.userAddress}" autocomplete="off" placeholder="请输入用户地址" class="layui-input">--%>
+                    <div class="layui-form-item userAddress">
+                        <input type="text" name="userAddress" value="${user.userAddress}" lay-verify="userAddress" style="display: none">
+                        <div class="layui-input-inline">
+                            <select name="province" lay-filter="province" class="province">
+                                <option value="${province}">请选择省</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="city" lay-filter="city" disabled>
+                                <option value="${city}">请选择市</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="area" lay-filter="area" disabled>
+                                <option value="${area}">请选择县/区</option>
+                            </select>
+                        </div>
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -159,10 +170,19 @@
         $("#uploadImage").after(html);
     }
 
-    layui.use(['form', 'layedit', 'laydate','upload'], function() {
+    var form, $,areaData;
+    layui.config({
+        base : "${rootPath}/js/"
+    }).extend({
+        "address" : "address"
+    })
+    layui.use(['form', 'layedit', 'laydate','upload',"address"], function() {
         let form = layui.form
             , layedit = layui.layedit
-            , laydate = layui.laydate;
+            , laydate = layui.laydate
+            , address = layui.address;
+        //获取省信息
+        address.provinces();
 
         //自定义验证规则
         form.verify({
@@ -179,6 +199,40 @@
         });
         //监听提交
         form.on('submit(save)', function(data){
+            /**
+             * 先整理地址数据
+             * */
+            let i;
+            let j;
+            if(data.province != ""){
+                for(i in res){
+                    if(data.province === res[i].code){
+                        address += res[i].name;
+                        break;
+                    }
+                }
+            }
+            let citys
+            if(data.city != ''){
+                citys = res[i].childs;
+                for(j in citys){
+                    if(data.city === citys[j].code){
+                        address = address+"-"+citys[j].name;
+                        break;
+                    }
+                }
+            }
+            if(data.area != '' && citys != null){
+                let areas = citys[j].childs;
+                for(let k in areas){
+                    if(data.area === areas[k].code){
+                        address = address+"-"+areas[k].name;
+                        break;
+                    }
+                }
+            }
+            data.userAddress = address;
+
             console.log('提交form',data);
             let loading = layer.msg('保存中', {
                 icon: 16

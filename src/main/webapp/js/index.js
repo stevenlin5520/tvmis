@@ -5,7 +5,6 @@ layui.config({
 	"bodyTab" : "bodyTab"
 })
 layui.use(['bodyTab','form','element','layer','jquery'],function(){
-	console.log("121212")
 	//初始化系统界面
 	let userType = 1
 	let cookieList = document.cookie.split("; ");
@@ -20,7 +19,7 @@ layui.use(['bodyTab','form','element','layer','jquery'],function(){
 	if(userType == 2){
 		menuUrl = "json/auditNavs.json"
 	}else if(userType == 3){
-		menuUrl = "json/auditNavs.json"
+		menuUrl = "json/supplierNavs.json"
 	}else if(userType == 9){
 		menuUrl = "json/navs.json"
 	}else{

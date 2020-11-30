@@ -60,6 +60,13 @@ public class UserController extends BaseController {
 		model.addAttribute("bean",tUser);
 		model.addAttribute("suppliers",collect);
 		model.addAttribute("birthday", DateUtil.getDateStr(tUser.getUserBirthday()));
+		if(StringUtils.isNotBlank(tUser.getUserAddress())){
+			String userAddress = userInfo.getUserAddress();
+			String[] split = userAddress.split("-");
+			model.addAttribute("province",split.length>0 ? split[0] : "");
+			model.addAttribute("city",split.length>1 ? split[1] : "");
+			model.addAttribute("area",split.length>2 ? split[2] : "");
+		}
 		return "view/user/user_edit";
 	}
 
@@ -105,9 +112,9 @@ public class UserController extends BaseController {
 		if(userInfo != null && StringUtils.isNotBlank(userInfo.getUserAddress())){
 			String userAddress = userInfo.getUserAddress();
 			String[] split = userAddress.split("-");
-			model.addAttribute("province",split[0]);
-			model.addAttribute("city",split[1]);
-			model.addAttribute("area",split[2]);
+			model.addAttribute("province",split.length>0 ? split[0] : "");
+			model.addAttribute("city",split.length>1 ? split[1] : "");
+			model.addAttribute("area",split.length>2 ? split[2] : "");
 		}
 		model.addAttribute("user",userInfo);
 		model.addAttribute("birthday",DateUtil.getDateStr(userInfo.getUserBirthday()));

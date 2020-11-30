@@ -97,8 +97,8 @@
                 <td style="text-align: center">
                     <label >供应商：</label>
                 </td>
-                <td >
-                    <select name="supplierId" lay-filter="type" lay-verify="required">
+                <td class="supplier">
+                    <select name="supplierId" lay-filter="type" lay-verify="required" class="supplierSelect">
                         <option value="" >请选择供应商</option>
                         <c:forEach var="supplier" items="${suppliers}" varStatus="status">
                             <option value="${supplier.supplierId}" <c:if test="${bean.supplierId==supplier.supplierId}">selected</c:if> >${supplier.supplierName}</option>
@@ -123,7 +123,9 @@
     </form>
 </div>
 <script type="text/javascript">
-    window.onload=function(){
+    var form
+
+    function loadButton(){
         let tvScreen = "${bean.tvScreen}";
         if(tvScreen == null || tvScreen == ''){
             return ;
@@ -140,8 +142,37 @@
         $("#uploadVideo").after(html2);
     }
 
+    window.onload=function(){
+        loadButton()
+
+        //供应商选择
+        let cookieList = document.cookie.split("; ");
+        let userType
+        let userOrg
+        for(let i in cookieList){
+            let item = cookieList[i]
+            if(cookieList[i].startsWith("userType=")){
+                userType = item.substring(9,item.length)
+            }else if(cookieList[i].startsWith("userOrg=")){
+                userOrg = item.substring(8,item.length)
+            }
+        }
+        if(userType == 3){
+            console.log($(".supplierSelect option"))
+            $(".supplierSelect option").each(function (index,obj) {
+                if(userOrg != $(obj).val()){
+                    $(obj).remove()
+                }
+            })
+            setTimeout(function(){
+                form.render('select');
+            },100)
+        }
+
+    }
+
     layui.use(['form', 'layedit', 'laydate','upload'], function() {
-        var form = layui.form
+        form = layui.form
             , layedit = layui.layedit
             , laydate = layui.laydate;
 

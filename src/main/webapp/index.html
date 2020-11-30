@@ -107,6 +107,7 @@
 		let userId
 		let userName
 		let userPhoto
+		let userType
 		for(let i in cookieList){
 			let item = cookieList[i]
 			if(cookieList[i].startsWith("userId=")){
@@ -126,8 +127,18 @@
 				}
 			}else if(cookieList[i].startsWith("userType=")){
 				userType = item.substring(9,item.length)
+				if(userType==1){
+					$("iframe").attr("src","import/list?page=1&limit=10&type=1")
+				}else if(userType == 2){
+					$("iframe").attr("src","audit/list?page=1&limit=10&type=1")
+				}else if(userType == 3){
+					$("iframe").attr("src","television/list?page=1&limit=10")
+				}else if(userType == 9){
+					$("iframe").attr("src","user/list?page=1&limit=10")
+				}
 			}
 		}
+
 	}
 
 
