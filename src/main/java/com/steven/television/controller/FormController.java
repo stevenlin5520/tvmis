@@ -1,10 +1,10 @@
 package com.steven.television.controller;
 
 import com.steven.television.common.BaseController;
-import com.steven.television.entity.Page;
-import com.steven.television.entity.TForm;
-import com.steven.television.entity.TPlay;
+import com.steven.television.entity.*;
+import com.steven.television.services.ChannelService;
 import com.steven.television.services.FormService;
+import com.steven.television.util.ParamsUtil;
 import com.steven.television.util.Result;
 import com.steven.television.util.StringUtil;
 import com.steven.television.util.UUIDUtil;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,16 +34,34 @@ public class FormController extends BaseController {
 
     @Resource
     private FormService formService ;
+    @Resource
+    private ChannelService channelService;
 
     @GetMapping("list")
-    public ModelAndView list(Page<TForm> pager){
+    public ModelAndView list(Page<FormVo> pager, String channelId, String startTime){
         ModelAndView modelAndView = new ModelAndView("view/form/form_list");
         //分页
         pager.setStartRow((pager.getPage()-1)*pager.getLimit());
-        Page<TForm> supplierPage = formService.list(pager);
+        Page<FormVo> supplierPage = formService.list2(pager,channelId,startTime);
         modelAndView.addObject("pager",supplierPage);
+        List<TChannel> channelList = channelService.list();
+        modelAndView.addObject("channelList",channelList);
+        modelAndView.addObject("channelId",channelId);
+        modelAndView.addObject("startTime",startTime);
         return modelAndView;
     }
+
+   /* @GetMapping("list")
+    public ModelAndView list(Page<TForm> pager,String channelId,String startTime){
+        ModelAndView modelAndView = new ModelAndView("view/form/form_list");
+        //分页
+        pager.setStartRow((pager.getPage()-1)*pager.getLimit());
+        Page<TForm> supplierPage = formService.list(pager,channelId,startTime);
+        modelAndView.addObject("pager",supplierPage);
+        List<TChannel> channelList = channelService.list();
+        modelAndView.addObject("channelList",channelList);
+        return modelAndView;
+    }*/
 
     @GetMapping("edit")
     public String edit(String id, Model model){
@@ -107,4 +126,21 @@ public class FormController extends BaseController {
         return Result.toResult(result > 0, result);
     }
 
+
+    @PostMapping("autoBuildForm")
+    @ResponseBody
+    public Result autoBuildForm(String channelId,String date) throws ParseException {
+        if(StringUtil.isBlank(channelId) || StringUtil.isBlank(date)){
+            return Result.failed("参数不全");
+        }
+        formService.autoBuildForm(date,channelId);
+        return Result.success("操作成功");
+    }
+
+    @GetMapping("toBuild")
+    public ModelAndView toBuild(){
+        ModelAndView modelAndView = new ModelAndView("view/form/form_build");
+        modelAndView.addObject("channelList",channelService.list());
+        return modelAndView;
+    }
 }

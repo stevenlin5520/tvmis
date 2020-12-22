@@ -462,8 +462,9 @@
   <resultMap id="ImportMap" type="com.steven.television.entity.ImportVo"></resultMap>
   <select id="selectByPage" resultMap="ImportMap" parameterType="map" resultType="list">
     select t1.import_id importId,t2.tv_id tvId,t1.start_time startTime,t1.ent_time endTime,t1.import_length importLength,
-    t1.import_audit auditState,t2.tv_name tvName,t2.tv_screen tvScreen,t2.tv_location tvLocation,t1.type,t2.supplier_id orgId
+    t1.import_audit auditState,t2.tv_name tvName,t2.tv_screen tvScreen,t2.tv_location tvLocation,t1.type,t2.supplier_id orgId,tc.channel_name channelName,t1.channel_id channelId
     from t_import t1 left join t_television t2 on t1.television_id=t2.tv_id and t1.type=t2.tv_type
+    left join t_channel tc on tc.channel_id=t1.channel_id
     where t1.status=1
     <if test="type == 1 or type == 2">
       and t1.type=#{type}
@@ -490,5 +491,19 @@
     <if  test="search">
       ${search}
     </if>
+  </select>
+
+  <select id="selectImportForm" resultMap="BaseResultMap" resultType="list" parameterType="map">
+    select * from t_import where import_audit=2 and status=1
+    <if test="date != null or date != ''">
+      and date_format(start_time,'%Y-%m-%d')=#{date}
+    </if>
+    <if test="channelId != null or channelId != ''">
+      and channel_id=#{channelId}
+    </if>
+    <if test="type != null or type != 0">
+      and type=#{type}
+    </if>
+    order by start_time asc
   </select>
 </mapper>

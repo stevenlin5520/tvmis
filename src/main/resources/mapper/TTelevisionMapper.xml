@@ -20,6 +20,7 @@
     <result column="supplier_id" jdbcType="VARCHAR" property="supplierId" />
     <result column="audit_state" jdbcType="VARCHAR" property="auditState" />
     <result column="audit_remark" jdbcType="VARCHAR" property="auditRemark" />
+    <result column="tv_category" jdbcType="INTEGER" property="tvCategory" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <!--
@@ -96,7 +97,7 @@
       This element was generated on Mon Nov 09 22:22:16 CST 2020.
     -->
     tv_id, tv_name, tv_desc, tv_screen, tv_location, tv_type, tv_length, status, create_time, 
-    update_time, supplier_id, audit_state, audit_remark
+    update_time, supplier_id, audit_state, audit_remark,tv_category
   </sql>
   <select id="selectByExample" parameterType="com.steven.television.entity.TTelevisionExample" resultMap="BaseResultMap">
     <!--
@@ -158,12 +159,12 @@
       tv_screen, tv_location, tv_type, 
       tv_length, status, create_time, 
       update_time, supplier_id, audit_state, 
-      audit_remark)
+      audit_remark,tv_category)
     values (#{tvId,jdbcType=VARCHAR}, #{tvName,jdbcType=VARCHAR}, #{tvDesc,jdbcType=VARCHAR}, 
       #{tvScreen,jdbcType=VARCHAR}, #{tvLocation,jdbcType=VARCHAR}, #{tvType,jdbcType=INTEGER}, 
       #{tvLength,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{supplierId,jdbcType=VARCHAR}, #{auditState,jdbcType=VARCHAR}, 
-      #{auditRemark,jdbcType=VARCHAR})
+      #{auditRemark,jdbcType=VARCHAR},#{tvCategory,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.steven.television.entity.TTelevision">
     <!--
@@ -212,6 +213,9 @@
       <if test="auditRemark != null">
         audit_remark,
       </if>
+      <if test="tvCategory != null">
+        tv_category,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="tvId != null">
@@ -252,6 +256,9 @@
       </if>
       <if test="auditRemark != null">
         #{auditRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="tvCategory != null">
+        #{tvCategory,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -313,6 +320,9 @@
       <if test="record.auditRemark != null">
         audit_remark = #{record.auditRemark,jdbcType=VARCHAR},
       </if>
+      <if test="record.tvCategory != null">
+        tv_category = #{record.tvCategory,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -334,10 +344,11 @@
       tv_length = #{record.tvLength,jdbcType=BIGINT},
       status = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      supplier_id = #{record.supplierId,jdbcType=VARCHAR},
-      audit_state = #{record.auditState,jdbcType=VARCHAR},
-      audit_remark = #{record.auditRemark,jdbcType=VARCHAR}
+    update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+    supplier_id = #{record.supplierId,jdbcType=VARCHAR},
+    audit_state = #{record.auditState,jdbcType=VARCHAR},
+    audit_remark = #{record.auditRemark,jdbcType=VARCHAR},
+    tv_category = #{record.tvCategory,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -386,6 +397,9 @@
       <if test="auditRemark != null">
         audit_remark = #{auditRemark,jdbcType=VARCHAR},
       </if>
+      <if test="tvCategory != null">
+        tv_category = #{tvCategory,jdbcType=INTEGER},
+      </if>
     </set>
     where tv_id = #{tvId,jdbcType=VARCHAR}
   </update>
@@ -403,6 +417,7 @@
       tv_type = #{tvType,jdbcType=INTEGER},
       tv_length = #{tvLength,jdbcType=BIGINT},
       status = #{status,jdbcType=INTEGER},
+    tv_category = #{tvCategory,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       supplier_id = #{supplierId,jdbcType=VARCHAR},
@@ -422,6 +437,7 @@
     <if test="auditState != null and auditState != ''">
       and audit_state=#{auditState}
     </if>
+    and supplier_id != 'sys'
      order by create_time desc
   </select>
 
@@ -439,6 +455,7 @@
     <if test="search != null and search != ''">
       ${search}
     </if>
+    /*and supplier_id != 'sys'*/
     order by create_time desc
   </select>
 
@@ -456,6 +473,7 @@
     <if test="search != null and search != ''">
       ${search}
     </if>
+    /*and supplier_id != 'sys'*/
   </select>
 
   <resultMap id="TelevisionVoMap" type="com.steven.television.entity.TelevisionVo"></resultMap>
@@ -476,5 +494,13 @@
     from t_play tp left join t_form tf on tp.play_form=tf.form_id left join t_television tt on tp.play_tv_id=tt.tv_id
     where tp.play_date=DATE_FORMAT(now(),'%Y-%m-%d') and form_content=#{channelId}
     order by play_start
+  </select>
+
+  <select id="selectSysTelevisionByType" resultMap="BaseResultMap" resultType="list" parameterType="int">
+    select <include refid="Base_Column_List"/> from t_television where status=1 and audit_state='1' and supplier_id = 'sys'
+    <if test="type == 1 or type == 2">
+      and tv_type=#{type}
+    </if>
+    order by create_time desc
   </select>
 </mapper>

@@ -3,7 +3,9 @@ package com.steven.television.services;
 import com.steven.television.entity.*;
 import com.steven.television.util.Result;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author steven
@@ -29,4 +31,6 @@ public interface ImportService {
     Result buildProject(TImport tImport,int auditStatus,String content);
 
     Result saveAuditTelevision(TTelevision tTelevison, int auditStatus, String content);
+
+    Result formList(String date,int type,String channelId,int length) throws ParseException;
 }

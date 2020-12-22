@@ -39,8 +39,8 @@
             <button type="button" class="layui-btn" onclick="addOrEdit('')">
                 <i class="layui-icon">&#xe608;</i> 添加
             </button>
-            <input type="text" name="search" value="${search}" autocomplete="off" placeholder="请输入节目名称" class="layui-input layui-input-block" style="width: 200px;margin-left: 20px;">
-            <button type="submit" class="layui-btn " <%--onclick="search()"--%> style="margin-left: 20px" lay-filter="search">
+            <input type="text" name="search" value="${search}" autocomplete="off" placeholder="请输入广告名称" class="layui-input layui-input-block" style="width: 200px;margin-left: 20px;">
+            <button type="submit" class="layui-btn" <%--onclick="search()"--%> style="margin-left: 20px" lay-filter="search">
                 <i class="layui-icon layui-icon-search"></i>查询
             </button>
         </div>
@@ -49,14 +49,13 @@
     <table class="table table-condensed" style="margin-top:8px;">
         <thead>
             <td align="center">序号</td>
-            <td align="center">节目名称</td>
-<%--            <td align="center">节目类型</td>--%>
-            <td align="center">节目分类</td>
+            <td align="center">广告名称</td>
+            <td align="center">广告分类</td>
             <td align="center">供应商</td>
-            <td align="center">节目时长</td>
+            <td align="center">广告时长</td>
 <%--            <td align="center">审核状态</td>--%>
 <%--            <td align="center">审核备注</td>--%>
-            <td align="center">节目描述</td>
+            <td align="center">广告描述</td>
             <td align="center">添加时间</td>
             <td align="center">操作</td>
         </thead>
@@ -69,21 +68,8 @@
                     <c:if test="${item.tvType == 2}">广告</c:if>
                 </td>--%>
                 <td align="center">
-                    <c:if test="${item.tvCategory == 1}">体育</c:if>
-                    <c:if test="${item.tvCategory == 2}">动漫</c:if>
-                    <c:if test="${item.tvCategory == 3}">电影</c:if>
-                    <c:if test="${item.tvCategory == 4}">娱乐</c:if>
-                    <c:if test="${item.tvCategory == 5}">访谈</c:if>
-                    <c:if test="${item.tvCategory == 6}">科教</c:if>
-                    <c:if test="${item.tvCategory == 7}">农业</c:if>
-                    <c:if test="${item.tvCategory == 8}">戏剧</c:if>
-                    <c:if test="${item.tvCategory == 9}">军事</c:if>
-                    <c:if test="${item.tvCategory == 10}">选秀</c:if>
-                    <c:if test="${item.tvCategory == 11}">少儿</c:if>
-                    <c:if test="${item.tvCategory == 12}">经济</c:if>
-                    <c:if test="${item.tvCategory == 13}">法制</c:if>
-                    <c:if test="${item.tvCategory == 21}">人文历史</c:if>
-                    <c:if test="${item.tvCategory == 22}">自然地理</c:if>
+                    <c:if test="${item.tvCategory == 91}">公益广告</c:if>
+                    <c:if test="${item.tvCategory == 92}">商业广告</c:if>
                 </td>
                 <td align="center">
                     <c:choose>
@@ -159,14 +145,14 @@
     function addOrEdit(id){
         layer.open({
             type: 2,
-            title:'新增/修改节目信息',
+            title:'新增/修改广告信息',
             closeBtn: 1, //显示关闭按钮
             shade: [0.5],
             area: ['900px', '500px'],
             offset: 't', //居中弹出
             time: 0, //0秒后自动关闭
             anim: 2,
-            content: ['${rootPath}/television/edit?id='+id+'&type=1', 'no'], //iframe的url，no代表不显示滚动条
+            content: ['${rootPath}/television/edit?id='+id+'&type=2', 'no'], //iframe的url，no代表不显示滚动条
             yes: function(index, layero){
                 console.log(index,layero);
                 layer.close(index); //如果设定了yes回调，需进行手工关闭

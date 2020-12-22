@@ -1,11 +1,10 @@
 package com.steven.television.dao;
 
-import com.steven.television.entity.Page;
-import com.steven.television.entity.TForm;
-import com.steven.television.entity.TFormExample;
-import java.util.List;
+import com.steven.television.entity.*;
 
-import com.steven.television.entity.TSupplier;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface TFormMapper {
@@ -123,8 +122,16 @@ public interface TFormMapper {
 
     TForm selectByDate(String date);
 
+    TForm selectByDateAndChannelId(@Param("date") String date, @Param("channelId") String channelId);
+
     List<TForm> list();
 
-    List<TForm> selectByPage(Page<TForm> pager);
-    int selectByPageCount(Page<TForm> pager);
+    List<TForm> selectByPage(Map pager);
+    int selectByPageCount(Map pager);
+
+    List<TForm> selectByCondition(Map map);
+
+    List<FormVo> selectByConditionPager(Map map);
+
+    int selectByConditionPagerCount(Map map);
 }

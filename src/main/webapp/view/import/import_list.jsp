@@ -31,15 +31,42 @@
 <body>
 
 <div style="margin: 10px;">
-    <div class="layui-btn-group">
+    <form action="import/list?page=1&limit=10" method="get" id="formList">
+        <input value="${page}" name="page" style="display: none;">
+        <input value="${limit}" name="limit" style="display: none;">
+        <input value="${type}" name="type" style="display: none;">
+        <div style="width: 1000px;height: 40px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">
+            <button type="button" class="layui-btn" onclick="addOrEdit('')">
+                <i class="layui-icon">&#xe608;</i> 添加
+            </button>
+            <select name="auditStatus" class="layui-select layui-input-inline" style="width: 200px;margin-left: 10px">
+                <option value="" >请选择审核状态</option>
+                <option value="1" <c:if test="${auditStatus==1}">selected</c:if>>待审核</option>
+                <option value="2" <c:if test="${auditStatus==2}">selected</c:if>>审核通过</option>
+                <option value="3" <c:if test="${auditStatus==3}">selected</c:if>>审核拒绝</option>
+                <option value="4" <c:if test="${auditStatus==4}">selected</c:if>>已撤销</option>
+            </select>
+            <select name="channelId" class="layui-select layui-input-inline" style="width: 200px;margin-left: 10px">
+                <option value="" >请选择频道</option>
+                <c:forEach var="item" items="${channelList}">
+                    <option value="${item.channelId}" <c:if test="${item.channelId==channelId}">selected</c:if> >${item.channelName}</option>
+                </c:forEach>
+            </select>
+            <input type="text" name="search" value="${search}" autocomplete="off" placeholder="请输入节目名称" class="layui-input layui-input-block" style="width: 200px;margin-left: 20px;">
+            <button type="submit" class="layui-btn " style="margin-left: 20px" lay-filter="search">
+                <i class="layui-icon layui-icon-search"></i>查询
+            </button>
+        </div>
+    </form>
+   <%-- <div class="layui-btn-group">
         <button type="button" class="layui-btn" onclick="addOrEdit('')">
             <i class="layui-icon">&#xe608;</i> 添加
         </button>
-    </div>
-
+    </div>--%>
     <table class="table table-condensed" style="margin-top:8px;">
         <thead>
             <td align="center">序号</td>
+            <td align="center">播放频道</td>
             <td align="center">节目名称</td>
             <td align="center">开始时间</td>
             <td align="center">结束时间</td>
@@ -51,6 +78,7 @@
         <c:forEach var="item" items="${pager.list}" varStatus="status">
             <tr>
                 <td align="center">${status.index+1}</td>
+                <td align="center">${item.channelName}</td>
                 <td align="center">${item.tvName}</td>
                 <td align="center"><fmt:formatDate value="${item.startTime}" type="both"></fmt:formatDate> </td>
                 <td align="center"><fmt:formatDate value="${item.endTime}" type="both"></fmt:formatDate> </td>
@@ -68,6 +96,11 @@
                 </td>
                 <td align="center">
                     <div class="layui-btn-group">
+                        <c:if test="${item.auditState==1}">
+                            <button type="button" class="layui-btn layui-btn-sm " onclick="cancelAudit('${item.importId}')">
+                                撤销
+                            </button>
+                        </c:if>
                         <button type="button" class="layui-btn layui-btn-sm " onclick="addOrEdit('${item.importId}')">
                             <i class="layui-icon">&#xe642;</i>
                         </button>
@@ -112,7 +145,7 @@
                 if((!first && (lastPage==undefined ? 1 : lastPage != obj.curr || lastLimit==undefined ? 1 : lastLimit != obj.limit))){
                     sessionStorage.setItem('lastPage',obj.curr);
                     sessionStorage.setItem('lastLimit',obj.limit);
-                    location.replace('${rootPath}/import/list?type=${type}&page='+obj.curr+'&limit='+obj.limit);
+                    location.replace('${rootPath}/import/list?type=${type}&page='+obj.curr+'&limit='+obj.limit+'&auditStatus=${auditStatus}&channelId=${channelId}&search=${search}');
                     console.log(232323)
                 }
             }
@@ -188,6 +221,35 @@
                     layer.close(index); //如果设定了yes回调，需进行手工关闭
                 }
             });
+    }
+
+    //撤销申请
+    function cancelAudit(importId){
+        layer.confirm("确认要撤销审核吗?", { title: "撤销提示" }, function (index) {
+            let loading = layer.msg('撤销中', {
+                icon: 16
+                ,anim: -1
+                ,shade: 0.5    //遮罩
+                ,fixed: true
+                ,time: false    //手动关闭
+            });
+            $.post('${rootPath}/import/cancelAudit', {id:importId}, function(res){
+                console.log(res)
+                layer.close(loading)
+                if(!res.state){
+                    layer.open({
+                        type: 0,
+                        title: '提示',
+                        content: res.msg,
+                        icon: -1,
+                        time: 2000
+                    })
+                }else{
+                    layer.msg(res.msg, {time: 1500, anim: 6});
+                    window.location.reload();
+                }
+            })
+        })
     }
 </script>
 </body>

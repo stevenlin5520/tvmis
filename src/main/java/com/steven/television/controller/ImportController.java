@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -41,12 +42,28 @@ public class ImportController extends BaseController {
     private ChannelService channelService;
 
     @RequestMapping("list")
-    public ModelAndView list(Page<ImportVo> pager, Integer type, String orgId){
+    public ModelAndView list(Page<ImportVo> pager, Integer type, String orgId,String search,Integer auditStatus,String channelId){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("view/import/import_list");
-        modelAndView.addObject("pager",importService.list(pager,orgId,type));
+        String condition = " and t1.type="+type;
+        if(StringUtil.isNotBlank(channelId)){
+            condition += " and t1.channel_id='"+channelId+"'";
+        }
+        if(StringUtil.isNotBlank(search)){
+            condition += " and t2.tv_name like '%"+search+"%'";
+        }
+        if(auditStatus != null){
+            condition += " and t1.import_audit="+auditStatus;
+        }
+        modelAndView.addObject("pager",importService.list(pager,condition));
+        modelAndView.addObject("channelList",channelService.list());
         modelAndView.addObject("type",type);
         modelAndView.addObject("orgId",orgId);
+        modelAndView.addObject("search",search);
+        modelAndView.addObject("auditStatus",auditStatus);
+        modelAndView.addObject("channelId",channelId);
+        modelAndView.addObject("page",pager.getPage());
+        modelAndView.addObject("limit",pager.getLimit());
         return modelAndView;
     }
 
@@ -57,6 +74,7 @@ public class ImportController extends BaseController {
             model.addAttribute("bean",bean);
             TTelevision tTelevision = televisionService.selectById(bean.getTelevisionId());
             model.addAttribute("tvName",tTelevision.getTvName());
+            model.addAttribute("orgId",tTelevision.getSupplierId());
             model.addAttribute("startTime", DateUtil.getDateTimeStr(bean.getStartTime()));
             model.addAttribute("endTime",DateUtil.getDateTimeStr(bean.getEntTime()));
         }else{
@@ -96,5 +114,40 @@ public class ImportController extends BaseController {
         return Result.toResult(result > 0, result);
     }
 
+    /**
+     * 撤销申请
+     * @param id
+     * @return
+     */
+    @PostMapping("cancelAudit")
+    @ResponseBody
+    public Result cancelAudit(String id){
+        TImport tImport = importService.selectById(id);
+        if(tImport == null){
+            return Result.failed("未找到申请记录");
+        }
+        tImport.setImportAudit(4);
+        tImport.setCommitUserId(userId);
+        tImport.getCommitUserName();
+        int result = importService.update(tImport);
+        return Result.toResult(result > 0, result);
+    }
 
+
+    /**
+     * 获取播放申请列表占位信息
+     * @param date
+     * @param type
+     * @param channelId
+     * @param length
+     * @return
+     */
+    @PostMapping("formList")
+    @ResponseBody
+    public Result formList(String date,int type,String channelId,int length) throws ParseException {
+        if(StringUtil.isBlank(date) || StringUtil.isBlank(channelId)){
+            return Result.failed("未选中播放日期或频道");
+        }
+        return importService.formList(date,type,channelId,length);
+    }
 }

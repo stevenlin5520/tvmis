@@ -38,13 +38,16 @@ public class TelevisionController extends BaseController {
     private SupplierService supplierService;
 
     @RequestMapping("list")
-    public ModelAndView list(Page<TTelevision> pager,Integer type,String orgId,String auditStatus){
+    public ModelAndView list(Page<TTelevision> pager,Integer type,String orgId,String auditStatus,String search){
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("view/television/television_list");
-        modelAndView.addObject("pager",televisionService.list(pager,type,orgId,auditStatus));
+        modelAndView.setViewName(type == 1 ? "view/television/television_list" : "view/television/advertist_list");
+        modelAndView.addObject("pager",televisionService.list(pager,type,orgId,auditStatus,search));
         modelAndView.addObject("suppliers",supplierService.list());
         modelAndView.addObject("type",type);
         modelAndView.addObject("orgId",orgId);
+        modelAndView.addObject("search",search);
+        modelAndView.addObject("page",pager.getPage());
+        modelAndView.addObject("limit",pager.getLimit());
         modelAndView.addObject("auditStatus",auditStatus);
         return modelAndView;
     }
@@ -69,11 +72,11 @@ public class TelevisionController extends BaseController {
     }
 
     @GetMapping("edit")
-    public String edit(String id, Model model){
+    public String edit(String id, Model model,int type){
         TTelevision television = televisionService.selectById(id);
         model.addAttribute("bean",television);
         model.addAttribute("suppliers",supplierService.list());
-        return "view/television/television_edit";
+        return type == 1 ? "view/television/television_edit" : "view/television/advertist_edit";
     }
 
     @PostMapping("save")
@@ -82,15 +85,14 @@ public class TelevisionController extends BaseController {
         int result = 0;
         television.setStatus(1);
         if(StringUtil.isBlank(television.getTvId())){
-            television.setAuditState("3");
+            television.setAuditState("1");
             television.setTvId(UUIDUtil.getUUIDSTR());
             television.setCreateTime(new Date());
-            //TODO 添加组织机构
             result = televisionService.insert(television);
         }else{
             TTelevision selectTelevision = televisionService.selectById(television.getTvId());
             if(StringUtil.isEquale(selectTelevision.getTvScreen(),television.getTvScreen()) || StringUtil.isEquale(selectTelevision.getTvLocation(),television.getTvLocation())){
-                television.setAuditState("3");
+                television.setAuditState("1");
             }
             television.setUpdateTime(new Date());
             result = televisionService.update(television);

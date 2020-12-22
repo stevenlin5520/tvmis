@@ -104,4 +104,6 @@ public interface TTelevisionMapper {
 
 
     List<TelevisionVo> televisionList(String channelId);
+
+    List<TTelevision> selectSysTelevisionByType(@Param("type") int type);
 }

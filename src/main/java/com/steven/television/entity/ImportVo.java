@@ -22,4 +22,6 @@ public class ImportVo {
     private String tvScreen;
     private String tvLocation;
     private int type;
+    private String channelId;
+    private String channelName;
 }

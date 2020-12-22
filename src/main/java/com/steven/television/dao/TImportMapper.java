@@ -100,4 +100,6 @@ public interface TImportMapper {
     List<ImportVo> selectByPage(Map map);
 
     int selectByPageCount(Map map);
+
+    List<TImport> selectImportForm(Map map);
 }

@@ -393,15 +393,65 @@
     select <include refid="Base_Column_List"/> from t_form where form_date=#{date}
   </select>
 
+  <select id="selectByDateAndChannelId" resultMap="BaseResultMap" parameterType="string">
+    select <include refid="Base_Column_List"/> from t_form where form_date=#{date} and form_content=#{channelId}
+  </select>
+
   <select id="list" resultType="list" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"/> from t_form where status=1 order by create_time desc
   </select>
 
   <select id="selectByPage" resultType="list" resultMap="BaseResultMap" parameterType="map">
-    select <include refid="Base_Column_List"/> from t_form where status=1 order by create_time desc limit #{startRow},#{limit}
+    select <include refid="Base_Column_List"/> from t_form where status=1
+    <if test="search != null and search != ''">
+      ${search}
+    </if>
+    order by create_time desc limit #{startRow},#{limit}
   </select>
 
   <select id="selectByPageCount" resultType="int" parameterType="map">
     select count(1) from t_form where status=1
+    <if test="search != null and search != ''">
+      ${search}
+    </if>
   </select>
+
+  <select id="selectByCondition" resultType="list" resultMap="BaseResultMap" parameterType="map">
+    select <include refid="Base_Column_List"/> from t_form where status=1
+    <if test="search != null and search != ''">
+      ${search}
+    </if>
+    order by create_time desc
+  </select>
+
+  <resultMap id="FormVo" type="com.steven.television.entity.FormVo"></resultMap>
+  <select id="selectByConditionPager" parameterType="map" resultType="list" resultMap="FormVo">
+    select tc.channel_name channelName,tf.form_date formDate, tp.play_start playStart,tp.play_end playEnd,tp.play_length playLength,tp.play_tv_name playName,tp.play_screen playScreen,tp.play_video playVideo,tt.tv_type tvType
+    from t_form tf left join t_play tp on tf.form_id=tp.play_form and tf.status=1
+    left join t_channel tc on tf.form_content=tc.channel_id
+    left join t_television tt on tp.play_tv_id=tt.tv_id
+    where 1=1
+    <if test="date != null and date != ''">
+      and DATE_FORMAT(tf.form_date,'%Y-%m-%d')=#{date}
+    </if>
+    <if test="channelId != null and channelId != ''">
+      and tc.channel_id = #{channelId}
+    </if>
+    order by tf.form_date,tp.play_start asc
+    limit #{startRow},#{limit}
+  </select>
+
+  <select id="selectByConditionPagerCount" parameterType="map" resultType="int">
+    select count(1)
+    from t_form tf left join t_play tp on tf.form_id=tp.play_form and tf.status=1
+    left join t_channel tc on tf.form_content=tc.channel_id
+    where 1=1
+    <if test="date != null and date != ''">
+      and DATE_FORMAT(tf.form_date,'%Y-%m-%d')=#{date}
+    </if>
+    <if test="channelId != null and channelId != ''">
+      and tc.channel_id = #{channelId}
+    </if>
+  </select>
+
 </mapper>

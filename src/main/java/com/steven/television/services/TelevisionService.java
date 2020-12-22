@@ -16,6 +16,8 @@ public interface TelevisionService {
 
     Page<TTelevision> list(Page<TTelevision> pager,Integer type,String orgId,String auditState);
 
+    Page<TTelevision> list(Page<TTelevision> pager,Integer type,String orgId,String auditState,String search);
+
     TTelevision selectById(String id);
 
     int deleteById(String id);

@@ -1,7 +1,6 @@
 package com.steven.television.util;
 
 import it.sauronsoftware.jave.Encoder;
-import org.apache.commons.fileupload.FileUpload;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -171,11 +170,17 @@ public class MultiMediaTransferUtil {
         map.put("fileId",fileId+suffix);
         if(videoTypes.contains(suffix.substring(1))){
             Map videoInfo = getVideoInfo(destFile);
-            if(videoInfo != null){
+            if(videoInfo != null && videoInfo.size()>0){
                 map.put("fileType","video");
                 map.put("duration",videoInfo.get("duration"));
                 return map;
             }
+
+            //解析错误就删除文件
+            destFile.delete();
+            map.put("state",false);
+            map.put("msg","文件不支持");
+            return map;
         }
 
         map.put("fileType","image");

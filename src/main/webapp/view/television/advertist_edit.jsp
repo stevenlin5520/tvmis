@@ -43,7 +43,7 @@
 <div style="margin: 10px;">
     <form class="layui-form" action="${rootPath}/television/save" style="margin-top:10px;" method="post">
         <input type="text" style="display: none;" name="tvId" value="${bean.tvId}">
-        <input type="text" style="display: none;" name="tvType" value="1">
+        <input type="text" style="display: none;" name="tvType" value="2">
         <table style="border-spacing:0px 10px;border-collapse:separate;">
             <colgroup>
                 <col width="150px">
@@ -53,53 +53,25 @@
             </colgroup>
             <tr>
                 <td style="text-align: center">
-                    <label >节目名称：</label>
+                    <label >广告名称：</label>
                 </td>
                 <td >
                     <input type="text" name="tvName" value="${bean.tvName}" lay-verify="required" autocomplete="off" placeholder="请输入节目名称" class="layui-input">
                 </td>
                 <td style="text-align: center">
-                    <label >节目分类：</label>
+                    <label >广告分类：</label>
                 </td>
                 <td >
                     <select name="tvCategory" lay-filter="tvCategory">
-                        <option value="" >请选择节目分类</option>
-                        <option value="1" <c:if test="${bean.tvCategory==1}">selected</c:if> >体育</option>
-                        <option value="2" <c:if test="${bean.tvCategory==2}">selected</c:if> >动漫</option>
-                        <option value="3" <c:if test="${bean.tvCategory==3}">selected</c:if> >电影</option>
-                        <option value="4" <c:if test="${bean.tvCategory==4}">selected</c:if> >娱乐</option>
-                        <option value="5" <c:if test="${bean.tvCategory==5}">selected</c:if> >访谈</option>
-                        <option value="6" <c:if test="${bean.tvCategory==6}">selected</c:if> >科教</option>
-                        <option value="7" <c:if test="${bean.tvCategory==7}">selected</c:if> >农业</option>
-                        <option value="8" <c:if test="${bean.tvCategory==8}">selected</c:if> >戏剧</option>
-                        <option value="9" <c:if test="${bean.tvCategory==9}">selected</c:if> >军事</option>
-                        <option value="10" <c:if test="${bean.tvCategory==10}">selected</c:if> >选秀</option>
-                        <option value="11" <c:if test="${bean.tvCategory==11}">selected</c:if> >少儿</option>
-                        <option value="12" <c:if test="${bean.tvCategory==12}">selected</c:if> >经济</option>
-                        <option value="13" <c:if test="${bean.tvCategory==13}">selected</c:if> >法制</option>
-                        <option value="21" <c:if test="${bean.tvCategory==21}">selected</c:if> >人文历史</option>
-                        <option value="22" <c:if test="${bean.tvCategory==22}">selected</c:if> >自然地理</option>
-                        <%--<c:if test="${item.tvCategory == 1}">体育</c:if>
-                        <c:if test="${item.tvCategory == 2}">动漫</c:if>
-                        <c:if test="${item.tvCategory == 3}">电影</c:if>
-                        <c:if test="${item.tvCategory == 4}">娱乐</c:if>
-                        <c:if test="${item.tvCategory == 5}">访谈</c:if>
-                        <c:if test="${item.tvCategory == 6}">科教</c:if>
-                        <c:if test="${item.tvCategory == 7}">农业</c:if>
-                        <c:if test="${item.tvCategory == 8}">戏剧</c:if>
-                        <c:if test="${item.tvCategory == 9}">军事</c:if>
-                        <c:if test="${item.tvCategory == 10}">选秀</c:if>
-                        <c:if test="${item.tvCategory == 11}">少儿</c:if>
-                        <c:if test="${item.tvCategory == 12}">经济</c:if>
-                        <c:if test="${item.tvCategory == 13}">法制</c:if>
-                        <c:if test="${item.tvCategory == 21}">人文历史</c:if>
-                        <c:if test="${item.tvCategory == 22}">自然地理</c:if>--%>
+                        <option value="" >请选择广告分类</option>
+                        <option value="91" <c:if test="${bean.tvCategory==91}">selected</c:if> >公益广告</option>
+                        <option value="92" <c:if test="${bean.tvCategory==92}">selected</c:if> >商业广告</option>
                     </select>
                 </td>
             </tr>
             <tr>
                 <td style="text-align: center">
-                    <label >节目截图：</label>
+                    <label >广告截图：</label>
                 </td>
                 <td >
                     <button type="button" class="layui-btn" id="uploadImage" style="margin-right: 50px;">
@@ -108,7 +80,7 @@
                     <input type="text" style="display: none;" name="tvScreen" value="${bean.tvScreen}" autocomplete="off" placeholder="请输入用户邮箱" class="layui-input">
                 </td>
                 <td style="text-align: center">
-                    <label >节目视频：</label>
+                    <label >广告视频：</label>
                 </td>
                 <td >
                     <button type="button" class="layui-btn" id="uploadVideo" style="margin-right: 50px;">
@@ -119,7 +91,7 @@
             </tr>
             <tr >
                 <td style="text-align: center">
-                    <label >节目时长(秒)：</label>
+                    <label >广告时长(秒)：</label>
                 </td>
                 <td >
                     <input type="text" name="tvLength" value="${bean.tvLength}" lay-verify="required" autocomplete="off" placeholder="请输入节目时长" class="layui-input">
@@ -139,7 +111,7 @@
             </tr>
             <tr>
                 <td style="text-align: center">
-                    <label >节目描述：</label>
+                    <label >广告描述：</label>
                 </td>
                 <td colspan="3" rowspan="2" style="">
                     <textarea name="tvDesc" placeholder="请输入内容" class="layui-textarea">${bean.tvDesc}</textarea>

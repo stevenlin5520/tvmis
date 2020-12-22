@@ -47,7 +47,7 @@ public class AuditController extends BaseController {
      * @return
      */
     @RequestMapping("list")
-    public ModelAndView list(Page<ImportVo> pager, Integer type, String orgId,Integer auditStatus){
+    public ModelAndView list(Page<ImportVo> pager, Integer type, String orgId,Integer auditStatus,String search){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("view/audit/audit_list");
         String sql = "";
@@ -59,12 +59,18 @@ public class AuditController extends BaseController {
         }
         if(auditStatus == null){
             sql += " and t1.import_audit in (1,3)";
-        }else if(auditStatus != null && Arrays.asList(1,3).contains(auditStatus)){
+        }else if(auditStatus != null){
             sql += " and t1.import_audit="+auditStatus;
+        }
+        if(StringUtil.isNotBlank(search)){
+            sql += " and t2.tv_name like '%"+search+"%'";
         }
         modelAndView.addObject("pager",importService.list(pager,sql));
         modelAndView.addObject("type",type);
+        modelAndView.addObject("page",pager.getPage());
+        modelAndView.addObject("limit",pager.getLimit());
         modelAndView.addObject("orgId",orgId);
+        modelAndView.addObject("search",search);
         modelAndView.addObject("auditStatus",auditStatus);
         return modelAndView;
     }

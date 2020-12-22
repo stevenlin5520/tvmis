@@ -27,17 +27,54 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"
             integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script type="text/javascript" src="${rootPath}/js/DateUtil.js"></script>
+    <style type="text/css">
+        .form0{
+            flex:0 0 150px;background-color: #D3D4D3;border: 1px solid black;color: white;text-align: center;line-height: 48px;
+        }
+        .form1{
+            flex:0 0 150px;background-color: #555555;border: 1px solid black;color: white;text-align: center;line-height: 48px;
+        }
+        .form2{
+            flex:0 0 150px;background-color: #009E94;border: 1px solid black;color: white;text-align: center;line-height: 48px;
+        }
+        .form3{
+            flex:0 0 150px;background-color: #e60000;border: 1px solid black;color: white;text-align: center;line-height: 48px;
+        }
+    </style>
 </head>
 
 <body>
-
+<div id="form-unit" style="display: none;width: 880px;height: 70px;margin-left:10px;">
+    <div id="form-item" style="width:880px;height:50px;font-size: 15px;overflow-x: scroll;display: flex;flex-direction: row;align-items: center;">
+        <%--<div class="form0">00:00:22--12:12:22</div>--%>
+    </div>
+    <div style="height: 20px;display: flex;flex-direction: row;justify-content: flex-end;align-items: center;margin-right: 20px;font-size: 13px;">
+        <%--白色未拍期0；灰色已排期1；绿色可申请2；红色已占用3--%>
+        <div style="width: 80px;height: 20px;display: flex;flex-direction: row;justify-content: space-evenly;align-items: center;">
+            <div style="background-color: #D3D4D3;width: 10px;height: 10px;">&nbsp;</div>
+            <div style="line-height: 20px;">未排期</div>
+        </div>
+        <div style="width: 80px;height: 20px;display: flex;flex-direction: row;justify-content: space-evenly;align-items: center;">
+            <div style="background-color: #555555;width: 10px;height: 10px;">&nbsp;</div>
+            <div style="line-height: 20px;">已排期</div>
+        </div>
+        <div style="width: 80px;height: 20px;display: flex;flex-direction: row;justify-content: space-evenly;align-items: center;">
+            <div style="background-color: #009E94;width: 10px;height: 10px;">&nbsp;</div>
+            <div style="line-height: 20px;">可申请</div>
+        </div>
+        <div style="width: 80px;height: 20px;display: flex;flex-direction: row;justify-content: space-evenly;align-items: center;">
+            <div style="background-color:#e60000;width: 10px;height: 10px;">&nbsp;</div>
+            <div style="line-height: 20px;">已占用</div>
+        </div>
+    </div>
+</div>
 <div style="margin: 10px;display: flex;flex-direction: row">
     <div style="width: 500px;height: 540px;">
         <div style="display: flex;flex-direction: row">
             <select name="orgId" class="layui-select layui-input-inline">
                 <option value="" >请选择供应商</option>
                 <c:forEach var="item" items="${suppliers}">
-                    <option value="${item.supplierId}">${item.supplierName}</option>
+                    <option value="${item.supplierId}" <c:if test="${item.supplierId==orgId}">selected</c:if> >${item.supplierName}</option>
                 </c:forEach>
             </select>
             <input type="text" class="layui-input-inline" placeholder="请输入节目名称" name="tvName">
@@ -60,7 +97,7 @@
         <input type="text" style="display: none;" name="importId" value="${bean.importId}">
         <input type="text" style="display: none;" name="televisionId" value="${bean.televisionId}">
         <input type="text" style="display: none;" name="type" value="${type}">
-        <table style="border-spacing:0px 10px;border-collapse:separate;">
+        <table style="border-spacing:0px 10px;border-collapse:separate;" id="tableForm">
             <colgroup>
                 <col width="100px">
                 <col width="250px">
@@ -70,7 +107,7 @@
                     <label >选择频道：</label>
                 </td>
                 <td >
-                    <select name="channelId" class="layui-select layui-input-inline" lay-verify="required">
+                    <select name="channelId" class="layui-select layui-input-inline" lay-verify="required" lay-filter="channel">
                         <option value="" >请选择频道</option>
                         <c:forEach var="item" items="${channelList}">
                             <option value="${item.channelId}" <c:if test="${item.channelId==bean.channelId}">selected</c:if> >${item.channelName}</option>
@@ -102,6 +139,14 @@
                     <input type="text" name="importLength" value="${bean.importLength}" autocomplete="off"  class="layui-input" readonly>
                 </td>
             </tr>
+            <tr id="endTime" style="display: none;background: white">
+                <td style="text-align: center">
+                    <label >结束时间：</label>
+                </td>
+                <td >
+                    <input type="text" name="endTime" value="" class="layui-input" readonly>
+                </td>
+            </tr>
             <%--<tr>
                 <td style="text-align: center">
                     <label >结束时间：</label>
@@ -119,8 +164,11 @@
     </form>
     </dvi>
 </div>
+<script type="text/javascript" src="../../js/DateUtil.js"></script>
 <script type="text/javascript">
-    var list = null
+    var formList = null;
+    var list = null;
+
     function search(){
         let tvName = $("input[name=tvName]").val();
         let orgId = $("select[name=orgId]").val();
@@ -173,13 +221,23 @@
         $("#tvName").val(list[index].tvName)
         $("input[name=importLength]").val(list[index].tvLength)
         $("input[name=televisionId]").val(list[index].tvId)
-        $("input[name=endTime]").val(list[index].tvId)
+
+        let startTime = $("input[name=startTime]").val();
+        $("#endTime").attr("style","display:none");
+        console.log(startTime);
+        if(startTime != null && startTime != ''){
+            $("input[name=endTime]").val(dateAddSeconds2Str(startTime,Number(list[index].tvLength)));
+            $("#endTime").attr("style","background: white");
+        }
+
+        viewDate();
     }
 
     layui.use(['form', 'layedit', 'laydate','upload'], function() {
         let form = layui.form
             , layedit = layui.layedit
             , laydate = layui.laydate;
+        let $ = layui.$;
 
         //自定义验证规则
         form.verify({
@@ -196,6 +254,29 @@
         });
         //监听提交
         form.on('submit(save)', function(data){
+            let startTime = $("input[name=startTime]").val();
+            let importLength = $("input[name=importLength]").val();
+            let endTime = dateAddSeconds2Str(startTime,Number(importLength));
+            let canSubmit = false;
+            debugger;
+            for(let i in formList){
+                //  白色未拍期0；灰色已排期1；绿色可申请2；红色已占用3
+                if(compareDateStr(formList[i].startTime,startTime)<=0 && compareDateStr(endTime,formList[i].endTime)<=0){
+                    if(formList[i].used==1 || formList[i].used==3){
+                        canSubmit = false;
+                        break;
+                    }else if(formList[i].used==0 || formList[i].used==2){
+                        canSubmit = true;
+                        break;
+                    }
+                }
+            }
+            if(!canSubmit){
+                layer.msg("该时间段不能申请", {time: 1500, anim: 6});
+                return false;
+            }
+
+
             console.log('提交form',data);
             let loading = layer.msg('保存中', {
                 icon: 16
@@ -239,7 +320,6 @@
             ,url: 'media/uploadFile' //上传接口
             ,done: function(res){
                 //上传完毕回调
-                console.log(11111,res)
                 if(res.state){
                     layer.msg("上传成功", {time: 1500, anim: 6});
                     $(".view-image").remove();
@@ -264,12 +344,24 @@
             type: 'datetime',
             format: 'yyyy-MM-dd HH:mm:ss',
             value: '${startTime}',
-            change: function(value, date, endDate){
-                console.log(value); //得到日期生成的值，如：2017-08-18
-                console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-                console.log(endDate); //得结束的日期时间对象，开启范围选择（range: true）才会返回。对象成员同上。
+            // min: 'new Date()',
+            /*change: function(value, date, endDate){
                 $("input[name=startTime]").val(value);
+                viewDate();
+            },*/
+            done: function(value, date, endDate){
+                $("input[name=startTime]").val(value);
+                viewDate();
+                let importLength = $("input[name=importLength]").val();
+                if(importLength != null && importLength != "") {
+                    $("input[name=endTime]").val(dateAddSeconds2Str(value, Number(importLength)));
+                    $("#endTime").attr("style", "background:white;");
+                }
             }
+        });
+
+        form.on('select(channel)',function(e){
+            viewDate()
         });
 
     })
@@ -295,7 +387,33 @@
             }
         });
     }
+    function viewDate(){
+        let startTime = $("input[name=startTime]").val();
+        let importLength = $("input[name=importLength]").val();
+        let type = '${type}';
+        let channelId = $("select[name=channelId] option:selected").val();
 
+        $.post('${rootPath}/import/formList',{date:startTime,type:Number(type),channelId:channelId,length:Number(importLength)},function (res){
+            if(!res.state || res.result.length==0)
+                return;
+
+            let result = res.result;
+            formList = res.result;
+            console.log(result);
+            let html = "";
+            for(let i in result){
+                html += "<div class='form"+result[i].used+"'>"+result[i].dateDis+"</div>";
+            }
+            // $("#form-unit").removeAttr("display");
+            $("#form-unit").attr("style","width: 880px;height: 70px;margin-left:10px;");
+            $("#form-item div").remove();
+            $("#form-item").append(html);
+        });
+    }
+    function changeChannel(obj){
+        console.log(obj);
+        viewDate();
+    }
 </script>
 </body>
 </html>

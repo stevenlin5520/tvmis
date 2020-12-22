@@ -435,4 +435,19 @@ public class TTelevision {
     public void setAuditRemark(String auditRemark) {
         this.auditRemark = auditRemark == null ? null : auditRemark.trim();
     }
+
+    /**
+     * 节目类别
+     * 节目：1体育；2动漫；3电影；4娱乐；5访谈；6科教；7农业；8戏剧；9军事；10选秀；11少儿；12经济；13法制；21人文历史；22自然地理
+     * 广告：91公益广告；92商业广告
+     */
+    private int tvCategory;
+
+    public int getTvCategory() {
+        return tvCategory;
+    }
+
+    public void setTvCategory(int tvCategory) {
+        this.tvCategory = tvCategory;
+    }
 }

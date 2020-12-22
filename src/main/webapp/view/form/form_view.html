@@ -26,7 +26,7 @@
 <body>
 
 <div style="display: flex;flex-direction: row">
-    <div style="width: auto;height: 100%;">
+    <div style="width: 100%;height: 100%;">
         <table class="table table-condensed" style="margin-top:8px;overflow-y: auto" id="table">
             <thead>
                 <td align="center">序号</td>
@@ -108,7 +108,7 @@
                 let html = "";
                 for(let index in list){
                     html += "<tr>\n" +
-                        "                    <td align=\"center\">"+(index+1)+"</td>\n" +
+                        "                    <td align=\"center\">"+(Number(index)+1)+"</td>\n" +
                         "                    <td align=\"center\">"+list[index].playTvName+"</td>\n" +
                         "                    <td align=\"center\">"+list[index].playStart+"</td>\n" +
                         "                    <td align=\"center\">"+list[index].playEnd+"</td>\n" +

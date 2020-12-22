@@ -5,6 +5,7 @@ import com.steven.television.entity.Page;
 import com.steven.television.entity.TTelevision;
 import com.steven.television.entity.TelevisionVo;
 import com.steven.television.services.TelevisionService;
+import com.steven.television.util.StringUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,6 +38,31 @@ public class TelevisionServiceImpl implements TelevisionService {
         }else{
             map.put("auditState",auditState);
         }
+        List<TTelevision> tTelevisions = televisionMapper.selectByPage(map);
+        int count = televisionMapper.selectByPageCount(map);
+        page.returnData(tTelevisions,count);
+        return page;
+    }
+
+    @Override
+    public Page<TTelevision> list(Page<TTelevision> page,Integer type,String orgId,String auditState,String search) {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("startRow",page.getStartRow());
+        map.put("limit",page.getLimit());
+        map.put("type",type);
+        map.put("orgId",orgId);
+        //表示审核查询请求
+        String condition = "";
+        if(auditState == "999"){
+            condition += " and audit_state in ('2','3')";
+        }else{
+            map.put("auditState",auditState);
+        }
+        map.put("auditState",auditState);
+        if(StringUtil.isNotBlank(search)){
+            condition += " and tv_name like('%"+search+"%')";
+        }
+        map.put("search", condition);
         List<TTelevision> tTelevisions = televisionMapper.selectByPage(map);
         int count = televisionMapper.selectByPageCount(map);
         page.returnData(tTelevisions,count);

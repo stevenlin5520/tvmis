@@ -56,4 +56,9 @@ public class DateUtil {
     public static Long diffDate(Date start,Date end){
         return (end.getTime()-start.getTime())/1000;
     }
+
+    public static String getTime(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        return sdf.format(date);
+    }
 }

@@ -31,6 +31,24 @@
 <body>
 
 <div style="margin: 10px;">
+    <form action="audit/list?page=1&limit=10" method="get" id="formList">
+        <input value="${page}" name="page" style="display: none;">
+        <input value="${limit}" name="limit" style="display: none;">
+        <input value="${type}" name="type" style="display: none;">
+        <div style="width: 1000px;height: 40px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">
+            <select name="auditStatus" class="layui-select layui-input-inline" style="width: 200px;margin-left: 10px">
+                <option value="" >请选择审核状态</option>
+                <option value="1" <c:if test="${auditStatus==1}">selected</c:if>>待审核</option>
+                <option value="2" <c:if test="${auditStatus==2}">selected</c:if>>审核通过</option>
+                <option value="3" <c:if test="${auditStatus==3}">selected</c:if>>审核拒绝</option>
+                <option value="4" <c:if test="${auditStatus==4}">selected</c:if>>已撤销</option>
+            </select>
+            <input type="text" name="search" value="${search}" autocomplete="off" placeholder="请输入节目名称" class="layui-input layui-input-block" style="width: 200px;margin-left: 20px;">
+            <button type="submit" class="layui-btn " style="margin-left: 20px" lay-filter="search">
+                <i class="layui-icon layui-icon-search"></i>查询
+            </button>
+        </div>
+    </form>
     <table class="table table-condensed" style="margin-top:8px;">
         <thead>
             <td align="center">序号</td>
@@ -55,13 +73,17 @@
                 </td>
                 <td align="center">
                     <c:if test="${item.auditState==1}">待审核</c:if>
+                    <c:if test="${item.auditState==2}">已通过</c:if>
                     <c:if test="${item.auditState==3}">已拒绝</c:if>
+                    <c:if test="${item.auditState==4}">已撤销</c:if>
                 </td>
                 <td align="center">
                     <div class="layui-btn-group">
-                        <button type="button" class="layui-btn layui-btn-sm " onclick="audit('${item.importId}')">
-                            <i class="layui-icon">&#xe642;</i>
-                        </button>
+                        <c:if test="${item.auditState != 2 and item.auditState != 4}">
+                            <button type="button" class="layui-btn layui-btn-sm " onclick="audit('${item.importId}')">
+                                <i class="layui-icon">&#xe642;</i>
+                            </button>
+                        </c:if>
                         <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" onclick="viewFile('${item.tvScreen}')">
                             <i class="layui-icon">&#xe64a;</i>
                         </button>
@@ -100,7 +122,7 @@
                 if((!first && (lastPage==undefined ? 1 : lastPage != obj.curr || lastLimit==undefined ? 1 : lastLimit != obj.limit))){
                     sessionStorage.setItem('lastPage',obj.curr);
                     sessionStorage.setItem('lastLimit',obj.limit);
-                    location.replace('${rootPath}/audit/list?type=${type}&page='+obj.curr+'&limit='+obj.limit);
+                    location.replace('${rootPath}/audit/list?type=${type}&page='+obj.curr+'&limit='+obj.limit+'&auditStatus=${auditStatus}&search=${search}');
                     console.log(232323)
                 }
             }

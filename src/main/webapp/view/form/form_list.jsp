@@ -31,19 +31,54 @@
 <body>
 
 <div style="margin: 10px;">
+    <form action="form/list?page=1&limit=10" method="get" id="formList">
+<%--        <div class="layui-btn-group">--%>
+        <input value="1" name="page" style="display: none;">
+        <input value="10" name="limit" style="display: none;">
+        <div style="width: 1000px;height: 40px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">
+            <button type="button" class="layui-btn layui-btn-normal" onclick="updateForm()">
+                <i class="layui-icon layui-icon-refresh"></i> 更新节目单
+            </button>
+            <select name="channelId" class="layui-select layui-input-inline" style="width: 200px;margin-left: 10px">
+                <option value="" >请选择频道</option>d
+                <c:forEach var="item" items="${channelList}">
+                    <option value="${item.channelId}" <c:if test="${item.channelId==channelId}">selected</c:if> >${item.channelName}</option>
+                </c:forEach>
+            </select>
+            <input type="text" id="startTime" name="startTime" value="${startTime}" autocomplete="off" placeholder="请输入播放时间" class="layui-input layui-input-block" style="width: 200px;margin-left: 20px;">
+            <button type="submit" class="layui-btn " <%--onclick="search()"--%> style="margin-left: 20px" lay-filter="search">
+                <i class="layui-icon layui-icon-search"></i>查询
+            </button>
+        </div>
+    </form>
     <table class="table table-condensed" style="margin-top:8px;">
         <thead>
-            <td align="center">序号</td>
+            <%--<td align="center">序号</td>
             <td align="center">播放时间</td>
+            <td align="center">播放频道</td>
             <td align="center">观看次数</td>
             <td align="center">添加时间</td>
+            <td align="center">操作</td>--%>
+            <td align="center">序号</td>
+            <td align="center">播放频道</td>
+            <td align="center">视频类型</td>
+            <td align="center">播放时间</td>
+            <td align="center">开始时间</td>
+            <td align="center">结束时间</td>
+            <td align="center">播放时长</td>
+            <td align="center">节目名称</td>
             <td align="center">操作</td>
         </thead>
         <c:forEach var="item" items="${pager.list}" varStatus="status">
             <tr>
-                <td align="center">${status.index+1}</td>
+                <%--<td align="center">${status.index+1}</td>
                 <td align="center"><fmt:formatDate value="${item.formDate}" type="date"></fmt:formatDate> </td>
                 <td align="center">${item.watchNum}</td>
+                <td align="center">
+                    <c:forEach var="item2" items="${channelList}">
+                        <c:if test="${item.formContent == item2.channelId}">${item2.channelName}</c:if>
+                    </c:forEach>
+                </td>
                 <td align="center"><fmt:formatDate value="${item.createTime}" type="both"></fmt:formatDate> </td>
                 <td align="center">
                     <div class="layui-btn-group">
@@ -54,7 +89,31 @@
                             <i class="layui-icon">&#xe640;</i>
                         </button>
                     </div>
-                </td>
+                </td>--%>
+                    <td align="center">${status.index+1}</td>
+                    <td align="center">${item.channelName}</td>
+                    <td align="center">${item.tvType==1 ? '节目' : '广告'}</td>
+                    <td align="center"><fmt:formatDate value="${item.formDate}" type="date"></fmt:formatDate> </td>
+                    <td align="center"><fmt:formatDate value="${item.playStart}" type="both"></fmt:formatDate> </td>
+                    <td align="center"><fmt:formatDate value="${item.playEnd}" type="both"></fmt:formatDate> </td>
+                    <td align="center">${item.playLength}</td>
+                    <td align="center">${item.playName}</td>
+                    <td align="center">
+                        <div class="layui-btn-group">
+                            <%--<button type="button" class="layui-btn layui-btn-sm " onclick="view('${item.formId}')">
+                                <i class="layui-icon">&#xe642;</i>
+                            </button>
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="deleted('${item.formId}')">
+                                <i class="layui-icon">&#xe640;</i>
+                            </button>--%>
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" onclick="viewFile('${item.playScreen}')">
+                                <i class="layui-icon">&#xe64a;</i>
+                            </button>
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-warm" onclick="viewFile('${item.playVideo}')">
+                                <i class="layui-icon">&#xe6ed;</i>
+                            </button>
+                        </div>
+                    </td>
             </tr>
         </c:forEach>
     </table>
@@ -65,9 +124,11 @@
 
 
 <script>
-    layui.use(['laypage', 'layer'], function(){
-        var laypage = layui.laypage
-            ,layer = layui.layer;
+    layui.use(['laypage', 'layer','laydate','form'], function(){
+        var laypage = layui.laypage,
+            form = layui.form,
+            layer = layui.layer,
+            laydate = layui.laydate;
         //自定义排版
         laypage.render({
             elem: 'pager',
@@ -83,11 +144,33 @@
                 if((!first && (lastPage==undefined ? 1 : lastPage != obj.curr || lastLimit==undefined ? 1 : lastLimit != obj.limit))){
                     sessionStorage.setItem('lastPage',obj.curr);
                     sessionStorage.setItem('lastLimit',obj.limit);
-                    location.replace('${rootPath}/form/list?page='+obj.curr+'&limit='+obj.limit);
+                    location.replace('${rootPath}/form/list?page='+obj.curr+'&limit='+obj.limit+'&channelId=${channelId}&startTime=${startTime}');
                 }
             }
         });
+        //日期监听
+        laydate.render({
+            elem: '#startTime', //指定元素
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            value: '${startTime}',
+            change: function(value, date, endDate){
+                $("input[name=startTime]").val(value);
+            }
+        });
+        //监听提交
+       /* form.on('submit(search)', function(data){
+            console.log('提交form',data);
+            let field = data.field;
+            console.log(field)
+            field.page=1;
+            field.limit=10;
+            console.log(field)
+            $.post(data.form.action, data.field, function(res){
 
+            })
+            return true;
+        });*/
     });
 
     function view(id){
@@ -97,7 +180,7 @@
             closeBtn: 1, //显示关闭按钮
             shade: [0.5],
             // area: ['1600px', '700px'],
-            area: ['640px', '700px'],
+            area: ['700px', '700px'],
             offset: 't', //居中弹出
             // offset: 'auto', //居中弹出
             time: 0, //0秒后自动关闭
@@ -144,6 +227,41 @@
             })
         })
     }
+    function viewFile(file){
+        layer.open({
+            type: 2,
+            title:'查看文件',
+            closeBtn: 1, //显示关闭按钮
+            shade: [0.5],
+            area: ['900px;', '600px'],
+            offset: 't', //居中弹出
+            time: 0, //0秒后自动关闭
+            anim: 2,
+            content: ['${filePath}/'+file, 'no'], //iframe的url，no代表不显示滚动条
+            yes: function(index, layero){
+                console.log(index,layero);
+                layer.close(index); //如果设定了yes回调，需进行手工关闭
+            }
+        });
+    }
+    function updateForm(){
+        layer.open({
+            type: 2,
+            title:'更新节目单',
+            closeBtn: 1, //显示关闭按钮
+            shade: [0.5],
+            area: ['400px', '530px'],
+            offset: 't', //居中弹出
+            time: 0, //0秒后自动关闭
+            anim: 2,
+            content: ['form/toBuild', 'no'], //iframe的url，no代表不显示滚动条
+            yes: function(index, layero){
+                console.log(index,layero);
+                layer.close(index); //如果设定了yes回调，需进行手工关闭
+            }
+        });
+    }
+
 </script>
 </body>
 </html>
