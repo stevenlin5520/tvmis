@@ -108,12 +108,11 @@ function initDate(dateStr){
     let date = split[0].split("-");
     let time = split[1].split(":");
     let year = Number(date[0]);
-    let month = Number(date[1].replace("0",""));
-    let day = Number(date[2].replace("0",""));
-
-    let hour = Number(time[0].replace("0",""));
-    let minute = Number(time[1].replace("0",""));
-    let second = Number(time[2].replace("0",""));
+    let month = Number(date[1].startsWith("0",0) ? date[1].replace("0","") : date[1]);
+    let day = Number(date[2].startsWith("0",0) ? date[2].replace("0","") : date[2]);
+    let hour = Number(time[0].startsWith("0",0) ? time[0].replace("0","") : time[0]);
+    let minute = Number(time[1].startsWith("0",0) ? time[1].replace("0","") : time[1]);
+    let second = Number(time[2].startsWith("0",0) ? time[2].replace("0","") : time[2]);
 
     return new Date(year,month-1,day,hour,minute,second,0);
 }

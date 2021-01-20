@@ -164,7 +164,6 @@
     </form>
     </dvi>
 </div>
-<script type="text/javascript" src="../../js/DateUtil.js"></script>
 <script type="text/javascript">
     var formList = null;
     var list = null;

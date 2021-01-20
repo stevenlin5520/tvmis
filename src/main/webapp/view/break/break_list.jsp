@@ -56,7 +56,11 @@
                     <c:if test="${item.ruleType==2}"><span style="color: #e47214">告警</span></c:if>
                     <c:if test="${item.ruleType==3}"><span style="color: #e60000">黑名单</span></c:if>
                 </td>
-                <td align="center">${item.orgId}</td>
+                <td align="center">
+                    <c:forEach var="sup" items="${suppliers}" >
+                        <c:if test="${sup.supplierId==item.orgId}">${sup.supplierName}</c:if>
+                    </c:forEach>
+                </td>
                 </td>
                 <td align="center"><fmt:formatDate value="${item.createTime}" type="both"></fmt:formatDate> </td>
                 <td align="center">

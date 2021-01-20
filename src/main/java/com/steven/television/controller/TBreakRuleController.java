@@ -40,6 +40,7 @@ public class TBreakRuleController extends BaseController {
         pager.setStartRow((pager.getPage()-1)*pager.getLimit());
         Page<TBreakRule> supplierPage = breakRuleService.list(pager);
         modelAndView.addObject("pager",supplierPage);
+        modelAndView.addObject("suppliers",supplierService.list());
         return modelAndView;
     }
 

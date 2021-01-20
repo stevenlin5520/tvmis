@@ -464,11 +464,18 @@
   </select>
 
   <select id="listByPage" resultType="list" resultMap="BaseResultMap" parameterType="map">
-    select <include refid="Base_Column_List"/> from t_user where status=1 order by create_time desc limit #{startRow},#{limit}
+    select <include refid="Base_Column_List"/> from t_user where status=1
+    <if test="data.userType != null">
+      and user_type &lt; #{data.userType}
+    </if>
+    order by create_time desc limit #{startRow},#{limit}
   </select>
 
   <select id="listByPageCount" resultType="int"  parameterType="map">
     select count(1) from t_user where status=1
+    <if test="data.userType != null">
+      and user_type &lt; #{data.userType}
+    </if>
   </select>
 
   <select id="selectByToken" resultMap="BaseResultMap" parameterType="string">

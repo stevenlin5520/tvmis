@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,9 @@ public class UserController extends BaseController {
 		ModelAndView modelAndView = new ModelAndView("view/user/user_list");
 		//分页
 		pager.setStartRow((pager.getPage()-1)*pager.getLimit());
+		HashMap<String, Object> map = new HashMap<>(2);
+		map.put("userType", userInfo.getUserType());
+		pager.setData(map);
 		Page<TUser> userPage = userService.list(pager);
 		modelAndView.addObject("pager",userPage);
 		return modelAndView;
@@ -58,10 +62,14 @@ public class UserController extends BaseController {
 		List<TSupplier> list = supplierService.list();
 		List<Object> collect = list.stream().filter(s -> s.getAuditStatus() == 1).collect(Collectors.toList());
 		model.addAttribute("bean",tUser);
+		TSupplier supplier = new TSupplier();
+		supplier.setSupplierName("电视台");
+		supplier.setSupplierId("sys");
+		collect.add(0,supplier);
 		model.addAttribute("suppliers",collect);
 		model.addAttribute("birthday", DateUtil.getDateStr(tUser.getUserBirthday()));
 		if(StringUtils.isNotBlank(tUser.getUserAddress())){
-			String userAddress = userInfo.getUserAddress();
+			String userAddress = tUser.getUserAddress();
 			String[] split = userAddress.split("-");
 			model.addAttribute("province",split.length>0 ? split[0] : "");
 			model.addAttribute("city",split.length>1 ? split[1] : "");
@@ -85,7 +93,11 @@ public class UserController extends BaseController {
 			tUser.setStatus(1);
 			result = userService.insert(tUser);
 		}else{
+			TUser dbUser = userService.selectById(tUser.getUserId());
 			tUser.setUpdateTime(new Date());
+			if(tUser.getUserType() == null || dbUser.getUserType()>tUser.getUserType()){
+				tUser.setUserType(dbUser.getUserType());
+			}
 			result = userService.update(tUser);
 		}
 
@@ -154,13 +166,12 @@ public class UserController extends BaseController {
 		if(!ParamsUtil.validateBlank(userId,userName,oldPassword,newPassword)){
 			return Result.failed("参数不全");
 		}
-		TUser tUser = userService.selectById(userId);
-		if(StringUtil.isNotEquale(tUser.getUserName(),userName) || StringUtil.isNotEquale(tUser.getUserPwd(),oldPassword)){
+		if(StringUtil.isNotEquale(userInfo.getUserName(),userName) || StringUtil.isNotEquale(userInfo.getUserPwd(),oldPassword)){
 			return Result.failed("用户名或密码错误");
 		}
-		tUser.setUserPwd(oldPassword);
-		tUser.setUpdateTime(new Date());
-		int update = userService.update(tUser);
+		userInfo.setUserPwd(newPassword);
+		userInfo.setUpdateTime(new Date());
+		int update = userService.update(userInfo);
 		if(update == 0){
 			return Result.failed("修改失败");
 		}

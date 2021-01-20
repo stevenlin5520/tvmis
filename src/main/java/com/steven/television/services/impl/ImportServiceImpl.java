@@ -129,7 +129,7 @@ public class ImportServiceImpl implements ImportService {
             hashMap.put("search", " and form_content='"+tImport.getChannelId()+"' and form_date='"+date+"'");
             List<TForm> tForms = formMapper.selectByCondition(hashMap);
             String formId;
-            if (tForms == null) {
+            if (tForms == null || tForms.size() == 0) {
                 TForm insertForm = new TForm();
                 formId = UUIDUtil.getUUIDSTR();
                 insertForm.setFormId(formId);
@@ -137,7 +137,7 @@ public class ImportServiceImpl implements ImportService {
                 insertForm.setCreateTime(now);
                 insertForm.setStatus(1);
                 insertForm.setWatchNum(0);
-                insertForm.setFormContent(television.getSupplierId());
+                insertForm.setFormContent(tImport.getChannelId());
                 formMapper.insert(insertForm);
             }else{
                 TForm tForm = tForms.get(0);
@@ -229,8 +229,8 @@ public class ImportServiceImpl implements ImportService {
         List<TImport> imports = tImportMapper.selectImportForm(map);
         if(imports == null || imports.size() == 0){
             HashMap<String, Object> itemMap = new HashMap<>(4);
-            itemMap.put("startTime",date1);
-            itemMap.put("endTime",date2);
+            itemMap.put("startTime",DateUtil.getDateTimeStr(date1));
+            itemMap.put("endTime",DateUtil.getDateTimeStr(date2));
             itemMap.put("dateDis","00:00:00--23:59:59");
             itemMap.put("type",0);
             itemMap.put("used",0);
@@ -302,16 +302,8 @@ public class ImportServiceImpl implements ImportService {
                     break;
                 }
 
-                if(imports.get(i+1) != null && item.getEntTime().compareTo(imports.get(i+1).getStartTime())!=0){
-                    itemMap = new HashMap<>(4);
-                    itemMap.put("startTime",item.getEntTime());
-                    itemMap.put("endTime",imports.get(i+1).getStartTime());
-                    itemMap.put("dateDis",DateUtil.getTime(item.getEntTime())+"--"+DateUtil.getTime(imports.get(i+1).getStartTime()));
-                    itemMap.put("type",0);
-                    itemMap.put("used",0);
-                    result.add(itemMap);
-                }
                 if(imports.size()==1 && item.getEntTime().compareTo(date2)<0 && item.getStartTime().compareTo(date1)>0){
+                    //只有一条
                     itemMap = new HashMap<>(4);
                     itemMap.put("startTime",item.getEntTime());
                     itemMap.put("endTime",date2);
@@ -320,6 +312,15 @@ public class ImportServiceImpl implements ImportService {
                     itemMap.put("used",0);
                     result.add(itemMap);
                     break;
+                }
+                if(imports.get(i+1) != null && item.getEntTime().compareTo(imports.get(i+1).getStartTime())!=0){
+                    itemMap = new HashMap<>(4);
+                    itemMap.put("startTime",item.getEntTime());
+                    itemMap.put("endTime",imports.get(i+1).getStartTime());
+                    itemMap.put("dateDis",DateUtil.getTime(item.getEntTime())+"--"+DateUtil.getTime(imports.get(i+1).getStartTime()));
+                    itemMap.put("type",0);
+                    itemMap.put("used",0);
+                    result.add(itemMap);
                 }
             }else if (i == imports.size()-1 && item.getEntTime().compareTo(date2)<0){
                 //最后一条

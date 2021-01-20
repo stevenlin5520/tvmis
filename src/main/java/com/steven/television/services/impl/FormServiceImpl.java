@@ -146,26 +146,43 @@ public class FormServiceImpl implements FormService {
             }
 
             //编排节目
+            if(tPlays.size() == 0){
+                Date diffBaseDate = DateUtil.getDate(date+" 00:00:00", "yyyy-MM-dd HH:mm:ss");
+                Long diff = 24*60*60L-1;
+                insertTelevision(sysTelevisionList, sysAdvertistList, diff, diffBaseDate, formId, formDate,minLength);
+                return;
+            }else if(tPlays.size() == 1){
+                Date diffBaseDate = DateUtil.getDate(date+" 00:00:00", "yyyy-MM-dd HH:mm:ss");
+                Long diff = DateUtil.diffDate(diffBaseDate, tPlays.get(0).getPlayStart());
+                insertTelevision(sysTelevisionList, sysAdvertistList, diff, diffBaseDate, formId, formDate,minLength);
+
+                diffBaseDate = tPlays.get(0).getPlayEnd();
+                diff = DateUtil.diffDate(tPlays.get(0).getPlayEnd(), DateUtil.getDate(date + " 23:59:59", "yyyy-MM-dd HH:mm:ss"));
+                insertTelevision(sysTelevisionList, sysAdvertistList, diff, diffBaseDate, formId, formDate,minLength);
+                return;
+            }
+
             for (int i = 0; i < tPlays.size(); i++) {
                 //时间间隔（单位：s）
                 Long diff = 0L;
                 //插入记录的开始时间基数
                 Date diffBaseDate = null;
+
                 if (i == 0) {
                     diffBaseDate = DateUtil.getDate(date+" 00:00:00", "yyyy-MM-dd HH:mm:ss");
                     diff = DateUtil.diffDate(diffBaseDate, tPlays.get(i).getPlayStart());
                 } else if (i == tPlays.size() - 1) {
+                    diffBaseDate = tPlays.get(i-1).getPlayEnd();
+                    diff = DateUtil.diffDate(tPlays.get(i-1).getPlayEnd(), tPlays.get(i).getPlayStart());
+                    insertTelevision(sysTelevisionList, sysAdvertistList, diff, diffBaseDate, formId, formDate,minLength);
+
+                    //最后再加一条
                     diffBaseDate = tPlays.get(i).getPlayEnd();
                     diff = DateUtil.diffDate(tPlays.get(i).getPlayEnd(), DateUtil.getDate(date + " 23:59:59", "yyyy-MM-dd HH:mm:ss"));
                 } else {
-                    diffBaseDate = tPlays.get(i).getPlayEnd();
-                    diff = DateUtil.diffDate(tPlays.get(i).getPlayEnd(), tPlays.get(i + 1).getPlayStart());
+                    diffBaseDate = tPlays.get(i-1).getPlayEnd();
+                    diff = DateUtil.diffDate(tPlays.get(i-1).getPlayEnd(), tPlays.get(i).getPlayStart());
                 }
-                insertTelevision(sysTelevisionList, sysAdvertistList, diff, diffBaseDate, formId, formDate,minLength);
-            }
-            if(tPlays.size() == 0){
-                Date diffBaseDate = DateUtil.getDate(date+" 00:00:00", "yyyy-MM-dd HH:mm:ss");
-                Long diff = 24*60*60L-1;
                 insertTelevision(sysTelevisionList, sysAdvertistList, diff, diffBaseDate, formId, formDate,minLength);
             }
         }catch(Exception e){

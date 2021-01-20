@@ -107,7 +107,6 @@
                 <td >
                     <select name="orgId" class="layui-select layui-input-inline" lay-verify="required">
                         <option value="" >请选择平台/供应商</option>
-                        <option value="sys" >电视台</option>
                         <c:forEach var="item" items="${suppliers}">
                             <option value="${item.supplierId}" <c:if test="${item.supplierId==bean.orgId}">selected</c:if> >${item.supplierName}</option>
                         </c:forEach>
@@ -157,6 +156,8 @@
     </form>
 </div>
 <script type="text/javascript">
+
+
     window.onload=function(){
         //初始化图片
         let userPhoto = "${bean.userPhoto}";
@@ -174,15 +175,15 @@
     layui.config({
         base : "${rootPath}/js/"
     }).extend({
-        "address" : "address"
+        "address_js" : "address"
     })
     layui.use(['form', 'layedit', 'laydate','upload',"address"], function() {
         let form = layui.form
             , layedit = layui.layedit
             , laydate = layui.laydate
-            , address = layui.address;
+            , address_js = layui.address;
         //获取省信息
-        address.provinces();
+        address_js.provinces();
 
         //自定义验证规则
         form.verify({
@@ -202,71 +203,78 @@
             /**
              * 先整理地址数据
              * */
-            let i;
-            let j;
-            if(data.province != ""){
-                for(i in res){
-                    if(data.province === res[i].code){
-                        address += res[i].name;
-                        break;
-                    }
-                }
-            }
-            let citys
-            if(data.city != ''){
-                citys = res[i].childs;
-                for(j in citys){
-                    if(data.city === citys[j].code){
-                        address = address+"-"+citys[j].name;
-                        break;
-                    }
-                }
-            }
-            if(data.area != '' && citys != null){
-                let areas = citys[j].childs;
-                for(let k in areas){
-                    if(data.area === areas[k].code){
-                        address = address+"-"+areas[k].name;
-                        break;
-                    }
-                }
-            }
-            data.userAddress = address;
+            console.log(data)
 
-            console.log('提交form',data);
-            let loading = layer.msg('保存中', {
-                icon: 16
-                ,anim: -1
-                ,shade: 0.5    //遮罩
-                ,fixed: true
-                ,time: false    //手动关闭
-            });
-            $.ajax({
-                url: data.form.action,
-                data: JSON.stringify(data.field),
-                dataType: 'json',
-                // contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-                contentType: 'application/json;charset=UTF-8',
-                type: 'post',
-                success: function(res){
-                    if(!res.state){
-                        layer.open({
-                            type: 0,
-                            title: '提示',
-                            content: res.msg,
-                            icon: -1,
-                            time: 2000
-                        })
-                    }else{
-                        let index = parent.layer.getFrameIndex(window.name);
-                        parent.layer.close(index);//关闭当前页
-                        window.parent.location.reload();
+            // $.ajaxSettings.async = false;
+            $.get("json/address.json", function (res) {
+                var res = res;
+                let address = "";
+                let i;
+                let j;
+                if(data.field.province != ""){
+                    for(i in res){
+                        if(data.field.province === res[i].code){
+                            address += res[i].name;
+                            break;
+                        }
                     }
-                },
-                complete: function(){
-                    layer.close(loading)
                 }
-            })
+                let citys
+                if(data.field.city != ''){
+                    citys = res[i].childs;
+                    for(j in citys){
+                        if(data.field.city === citys[j].code){
+                            address = address+"-"+citys[j].name;
+                            break;
+                        }
+                    }
+                }
+                if(data.field.area != '' && citys != null){
+                    let areas = citys[j].childs;
+                    for(let k in areas){
+                        if(data.field.area === areas[k].code){
+                            address = address+"-"+areas[k].name;
+                            break;
+                        }
+                    }
+                }
+                data.field.userAddress = address;
+
+                console.log('提交form',data);
+                let loading = layer.msg('保存中', {
+                    icon: 16
+                    ,anim: -1
+                    ,shade: 0.5    //遮罩
+                    ,fixed: true
+                    ,time: false    //手动关闭
+                });
+                $.ajax({
+                    url: data.form.action,
+                    data: JSON.stringify(data.field),
+                    dataType: 'json',
+                    // contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+                    contentType: 'application/json;charset=UTF-8',
+                    type: 'post',
+                    success: function(res){
+                        if(!res.state){
+                            layer.open({
+                                type: 0,
+                                title: '提示',
+                                content: res.msg,
+                                icon: -1,
+                                time: 2000
+                            })
+                        }else{
+                            let index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);//关闭当前页
+                            window.parent.location.reload();
+                        }
+                    },
+                    complete: function(){
+                        layer.close(loading)
+                    }
+                })
+            });
             return false;
         });
 

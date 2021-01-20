@@ -2,6 +2,7 @@ package com.steven.television.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author steven
@@ -107,5 +108,18 @@ public class Page<T> implements Serializable {
         this.setList(list);
         int pages = total/limit;
         this.pages=total%limit > 0 ? pages+1 : pages;
+    }
+
+    /**
+     * 传入其他参数
+     */
+    private Map data;
+
+    public Map getData() {
+        return data;
+    }
+
+    public void setData(Map data) {
+        this.data = data;
     }
 }

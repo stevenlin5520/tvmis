@@ -67,7 +67,7 @@ public class BreakRuleServiceImpl implements BreakRuleService {
             return 0;
         }
         tBreakRule.setUpdateTime(new Date());
-        tBreakRule.setStatus(1);
+        tBreakRule.setStatus(-1);
         return breakRuleMapper.updateByPrimaryKeySelective(tBreakRule);
     }
 
